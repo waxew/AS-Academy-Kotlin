@@ -1,1 +1,83 @@
-{"id":"kt-spc-010","chapterId":"kt-spc-03","title":"Release Engineering، Versioning و Migration","order":46,"durationMin":105,"objectives":["SemVer","database/content migration","rollback","compatibility"],"blocks":[{"type":"LIST","items":["release candidate بسازید","migration را روی داده واقعی‌نما تست کنید","backward compatibility را مشخص کنید","rollback یا forward-fix strategy داشته باشید","release note و checksum منتشر کنید"]},{"type":"IMPORTANT","text":"هیچ release production بدون مسیر بازیابی داده و rollback/forward-fix آماده منتشر نشود."}]} 
+{
+  "id": "kt-spc-010",
+  "chapterId": "kt-spc-03",
+  "title": "Release Engineering، Versioning و Migration",
+  "order": 46,
+  "durationMin": 180,
+  "objectives": [
+    "مدیریت SemVer و versionCode/versionName",
+    "طراحی database و content migration بدون از دست رفتن داده",
+    "اجرای staged rollout و release verification",
+    "طراحی rollback و forward-fix",
+    "تضمین reproducible build، checksum و signing identity"
+  ],
+  "blocks": [
+    {
+      "type": "PARAGRAPH",
+      "text": "Release engineering فاصله بین «کد روی سیستم من کار می‌کند» و «نسخه production قابل اعتماد است» را پوشش می‌دهد. artifact باید قابل ردیابی به commit، قابل بازتولید، تست‌شده و با هویت امضای ثابت منتشر شود."
+    },
+    {
+      "type": "SUBTITLE",
+      "text": "Versioning و compatibility"
+    },
+    {
+      "type": "LIST",
+      "items": [
+        "SemVer برای API/content: MAJOR تغییر ناسازگار، MINOR قابلیت سازگار، PATCH اصلاح.",
+        "Android versionCode باید در هر انتشار افزایش یابد و هرگز تکرار نشود.",
+        "schemaVersion را مستقل از app version نگه دارید تا migration قابل تشخیص باشد.",
+        "minimum supported version و compatibility matrix را مستند کنید."
+      ]
+    },
+    {
+      "type": "SUBTITLE",
+      "text": "Migration امن"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "Migration را روی snapshotهای داده واقعی‌نما و چند نسخه قدیمی آزمایش کنید. تست فقط fresh install کافی نیست؛ مسیر upgrade از نسخه‌های پشتیبانی‌شده باید تست شود. migration باید deterministic باشد و invariantهای داده بعد از اجرا بررسی شوند."
+    },
+    {
+      "type": "CODE",
+      "language": "kotlin",
+      "code": "val MIGRATION_3_4 = object : Migration(3, 4) {\n    override fun migrate(db: SupportSQLiteDatabase) {\n        db.execSQL(\"ALTER TABLE lesson_progress ADD COLUMN lastOpenedAt INTEGER NOT NULL DEFAULT 0\")\n    }\n}"
+    },
+    {
+      "type": "SUBTITLE",
+      "text": "Release pipeline"
+    },
+    {
+      "type": "LIST",
+      "items": [
+        "validate content/schema",
+        "lint + unit/integration/UI tests",
+        "assemble release و bundle release",
+        "sign با keystore ثابت و secret خارج از repository",
+        "verify signature و artifact metadata",
+        "تولید SHA-256 و release notes",
+        "staged rollout و مشاهده crash/error/latency",
+        "promote، rollback یا forward-fix بر اساس معیارهای از پیش تعیین‌شده"
+      ]
+    },
+    {
+      "type": "IMPORTANT",
+      "text": "تعویض تصادفی signing key می‌تواند مسیر آپدیت مستقیم APK را قطع کند. کلید انتشار باید backup امن، کنترل دسترسی و برنامه بازیابی داشته باشد و نباید داخل source repository commit شود."
+    },
+    {
+      "type": "SUBTITLE",
+      "text": "Rollback در برابر forward-fix"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "Rollback زمانی ساده است که schema/data توسط نسخه جدید به شکل ناسازگار تغییر نکرده باشد. در migrationهای برگشت‌ناپذیر، forward-fix اغلب امن‌تر است. قبل از انتشار مشخص کنید چه metricهایی rollout را متوقف می‌کنند و چه کسی تصمیم نهایی را می‌گیرد."
+    },
+    {
+      "type": "EXERCISE",
+      "text": "یک Release Drill کامل طراحی کنید: ارتقا دیتابیس از سه نسخه قدیمی، backup، migration verification، signature verification، checksum، staged rollout، معیار توقف و سناریوی rollback/forward-fix."
+    },
+    {
+      "type": "REFERENCE",
+      "text": "برای پروژه واقعی، release checklist باید همراه artifact و commit SHA آرشیو شود."
+    }
+  ]
+}
