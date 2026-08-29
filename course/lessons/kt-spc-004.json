@@ -1,1 +1,21 @@
-{"id":"kt-spc-004","chapterId":"kt-spc-01","title":"Room، Networking و Offline-first Android","order":27,"durationMin":110,"objectives":["Room entities/DAO","repository","network DTO mapping","offline-first sync"],"blocks":[{"type":"PARAGRAPH","text":"در معماری offline-first دیتابیس محلی منبع خواندن UI است و synchronization داده شبکه را به storage محلی وارد می‌کند."},{"type":"IMPORTANT","text":"DTO، Entity و Domain Model را وقتی semantics متفاوت دارند یکی نکنید؛ mapping مرزها را صریح نگه می‌دارد."}]}
+{
+ "id":"kt-spc-004","chapterId":"kt-spc-01","title":"Room، Networking و Offline-first Sync","order":27,"durationMin":210,
+ "objectives":["local source-of-truth","DTO/entity/domain mapping","sync queue","conflict resolution","migration/recovery"],
+ "blocks":[
+  {"type":"PARAGRAPH","text":"در offline-first، UI از storage محلی می‌خواند و network نقش synchronization دارد. این تصمیم باعث می‌شود رفتار برنامه در قطع شبکه قابل پیش‌بینی باشد، اما نیازمند مدل دقیق pending operation، conflict و deletion است."},
+  {"type":"SUBTITLE","text":"Model boundaries"},
+  {"type":"LIST","items":["DTO شکل قرارداد شبکه است.","Entity شکل persistence و indexها را منعکس می‌کند.","Domain model semantics کسب‌وکار را بیان می‌کند.","Mapper تغییرات هر boundary را ایزوله می‌کند."]},
+  {"type":"CODE","language":"kotlin","code":"data class TaskDto(val id: String, val title: String, val updatedAt: Long)\n@Entity data class TaskEntity(@PrimaryKey val id: String, val title: String, val updatedAt: Long, val dirty: Boolean)"},
+  {"type":"SUBTITLE","text":"Write path و pending queue"},
+  {"type":"PARAGRAPH","text":"برای UX واقعی offline، تغییر کاربر ابتدا در transaction محلی ثبت می‌شود و یک pending operation پایدار ساخته می‌شود. worker بعداً operation را به server می‌فرستد و فقط پس از acknowledgement وضعیت dirty/pending را پاک می‌کند."},
+  {"type":"LIST","items":["operation ID یکتا برای جلوگیری از duplicate","retry محدود با backoff","network constraint برای worker","transaction برای local change + enqueue","failure دائمی باید به UI/diagnostics قابل مشاهده باشد"]},
+  {"type":"SUBTITLE","text":"Conflict resolution"},
+  {"type":"LIST","items":["Last-write-wins ساده است ولی همیشه از نظر business درست نیست.","server-authoritative برای داده حساس مناسب‌تر است.","field-level merge برای مدل‌های قابل ادغام کاربرد دارد.","manual resolution برای تعارضی که از دست دادن داده غیرقابل قبول است.","policy باید deterministic و قابل تست باشد."]},
+  {"type":"SUBTITLE","text":"Deletion و tombstone"},
+  {"type":"PARAGRAPH","text":"حذف فیزیکی فوری می‌تواند باعث بازگشت رکورد حذف‌شده در sync شود. tombstone یا deletedAt به سیستم اجازه می‌دهد حذف را نیز مانند یک تغییر versioned همگام کند."},
+  {"type":"SUBTITLE","text":"Migration و recovery"},
+  {"type":"LIST","items":["Room migration را روی دیتابیس نسخه‌های قدیمی تست کنید.","pending queue در migration نباید گم شود.","sync باید بعد از process death قابل ادامه باشد.","برای corruption یا migration failure مسیر recovery تعریف کنید."]},
+  {"type":"EXERCISE","text":"Sync engine بسازید که create/update/delete را offline ثبت کند، پس از اتصال sync کند، duplicate را تحمل کند، conflict policy داشته باشد و پس از process death ادامه دهد. سناریوهای offline→online، 503، conflict و migration را تست کنید."},
+  {"type":"IMPORTANT","text":"Offline-first فقط cache کردن response نیست؛ یک مدل consistency و synchronization کامل است."}
+ ]
+}
