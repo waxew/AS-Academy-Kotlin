@@ -1,0 +1,8 @@
+[
+ {"id":"kt-prj-001","levelId":"kt-fnd","title":"CLI Expense Tracker","deliverables":["ثبت هزینه","لیست و مجموع","اعتبارسنجی ورودی"],"skills":["functions","collections","null-safety"]},
+ {"id":"kt-prj-002","levelId":"kt-beg","title":"Library Manager","deliverables":["مدل کتاب/عضو","repository","فایل یا persistence ساده","unit tests"],"skills":["OOP","collections","exceptions","testing"]},
+ {"id":"kt-prj-003","levelId":"kt-adv","title":"Async Data Aggregator","deliverables":["چند data source","coroutines","Flow state","timeout/retry","tests"],"skills":["coroutines","flow","sealed types","architecture"]},
+ {"id":"kt-prj-004","levelId":"kt-spc","title":"Android Task Manager","deliverables":["Compose UI","ViewModel","Room","Navigation","tests"],"skills":["android","compose","room","stateflow"]},
+ {"id":"kt-prj-005","levelId":"kt-spc","title":"Ktor REST Service","deliverables":["CRUD","validation","auth-ready structure","persistence","integration tests","Docker-ready config"],"skills":["ktor","serialization","backend","testing"]},
+ {"id":"kt-prj-006","levelId":"kt-spc","title":"KMP Notes","deliverables":["shared domain/data","Android target","iOS-ready shared module","offline repository","CI matrix"],"skills":["kmp","architecture","testing","ci"]}
+]

@@ -1,0 +1,9 @@
+[
+ {"term":"Null Safety","fa":"ایمنی در برابر null","definition":"مجموعه قابلیت‌های type system برای کاهش خطاهای null."},
+ {"term":"Smart Cast","fa":"تبدیل هوشمند نوع","definition":"تشخیص نوع دقیق‌تر توسط compiler پس از بررسی‌های ایمن."},
+ {"term":"Coroutine","fa":"کوروتین","definition":"واحد سبک اجرای تعلیق‌پذیر برای کار همزمان/ناهمزمان."},
+ {"term":"Flow","fa":"جریان","definition":"API واکنشی مبتنی بر coroutine برای انتشار دنباله‌ای از مقادیر."},
+ {"term":"Sealed Type","fa":"نوع مهروموم‌شده","definition":"hierarchy محدود که حالت‌های مجاز را برای compiler قابل شناخت می‌کند."},
+ {"term":"KMP","fa":"Kotlin Multiplatform","definition":"فناوری اشتراک کد Kotlin بین چند پلتفرم."},
+ {"term":"Gradle Kotlin DSL","fa":"DSL کاتلین گرادل","definition":"پیکربندی build گرادل با فایل‌های .gradle.kts و type safety بهتر."}
+]

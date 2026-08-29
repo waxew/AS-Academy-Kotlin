@@ -1,0 +1,1 @@
+{"id":"kt-beg-002","chapterId":"kt-beg-01","title":"Lambda و Higher-order Functions","order":8,"durationMin":55,"objectives":["تعریف lambda","پاس دادن function","ساخت API خوانا"],"blocks":[{"type":"CODE","language":"kotlin","code":"fun calculate(a: Int, b: Int, op: (Int, Int) -> Int) = op(a, b)\nval result = calculate(4, 6) { x, y -> x + y }"}]}

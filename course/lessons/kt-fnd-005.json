@@ -1,0 +1,1 @@
+{"id":"kt-fnd-005","chapterId":"kt-fnd-03","title":"شرط، when و حلقه‌ها","order":5,"durationMin":45,"objectives":["if expression","when expression","range و loop"],"blocks":[{"type":"CODE","language":"kotlin","code":"val score = 87\nval grade = when (score) {\n    in 90..100 -> \"A\"\n    in 80..89 -> \"B\"\n    else -> \"C\"\n}\nfor (i in 1..3) println(i)"}]}

@@ -1,0 +1,7 @@
+[
+ {"id":"kt-qz-fnd-001","lessonId":"kt-fnd-003","question":"برای مقدار تغییرناپذیر کدام کلیدواژه مناسب‌تر است؟","options":["var","val","lateinit","const فقط"],"correctIndex":1,"explanation":"val reference را برای assignment مجدد غیرقابل تغییر می‌کند."},
+ {"id":"kt-qz-fnd-002","lessonId":"kt-fnd-004","question":"عملگر ?: چه نام دارد؟","options":["Safe call","Elvis","Not-null assertion","Range"],"correctIndex":1,"explanation":"Elvis مقدار سمت راست را هنگام null بودن سمت چپ انتخاب می‌کند."},
+ {"id":"kt-qz-beg-001","lessonId":"kt-beg-003","question":"data class به طور خودکار کدام قابلیت را فراهم می‌کند؟","options":["networking","equals/hashCode/copy","coroutine scope","dependency injection"],"correctIndex":1,"explanation":"توابع داده‌محور استاندارد از properties سازنده اصلی تولید می‌شوند."},
+ {"id":"kt-qz-adv-001","lessonId":"kt-adv-002","question":"هدف Structured Concurrency چیست؟","options":["حذف suspend","مدیریت عمر کارهای async در scope والد","جایگزینی thread","حذف exception"],"correctIndex":1,"explanation":"کارهای فرزند به lifecycle و cancellation والد متصل می‌شوند."},
+ {"id":"kt-qz-spc-001","lessonId":"kt-spc-003","question":"بهترین کاندید برای commonMain چیست؟","options":["API اختصاصی دوربین iOS","منطق دامنه مشترک","Android Activity","Windows Registry"],"correctIndex":1,"explanation":"commonMain باید کد واقعاً مشترک بین targetها را نگه دارد."}
+]

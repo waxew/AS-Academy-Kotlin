@@ -1,0 +1,10 @@
+[
+ {"id":"kt-ex-fnd-001","lessonId":"kt-fnd-003","title":"ماشین حساب تخفیف","difficulty":"easy","prompt":"تابعی بسازید که قیمت و درصد تخفیف را بگیرد و قیمت نهایی را برگرداند.","acceptance":["ورودی منفی رد شود","برای تخفیف صفر همان قیمت بازگردد","نام پارامترها خوانا باشد"]},
+ {"id":"kt-ex-fnd-002","lessonId":"kt-fnd-004","title":"پروفایل Nullable","difficulty":"easy","prompt":"نام اختیاری کاربر را بدون !! نمایش دهید و برای null مقدار مهمان را چاپ کنید."},
+ {"id":"kt-ex-beg-001","lessonId":"kt-beg-001","title":"گزارش فروش","difficulty":"medium","prompt":"از لیست فروش‌ها مجموع، میانگین و سه مبلغ بزرگ را محاسبه کنید."},
+ {"id":"kt-ex-beg-002","lessonId":"kt-beg-003","title":"مدل سفارش","difficulty":"medium","prompt":"Order و OrderItem را با data class و یک repository interface طراحی کنید."},
+ {"id":"kt-ex-adv-001","lessonId":"kt-adv-001","title":"مدل State","difficulty":"hard","prompt":"یک sealed hierarchy برای Idle/Loading/Success/Error بسازید و با when exhaustively render کنید."},
+ {"id":"kt-ex-adv-002","lessonId":"kt-adv-003","title":"جریان جستجو","difficulty":"hard","prompt":"جریان query را debounce و distinctUntilChanged کرده و نتایج را با flatMapLatest تولید کنید."},
+ {"id":"kt-ex-spc-001","lessonId":"kt-spc-001","title":"صفحه فهرست کارها","difficulty":"hard","prompt":"Compose screen با ViewModel، StateFlow و رویدادهای add/toggle/delete بسازید."},
+ {"id":"kt-ex-spc-002","lessonId":"kt-spc-002","title":"REST API","difficulty":"hard","prompt":"API CRUD با validation، error mapping و test پیاده‌سازی کنید."}
+]
