@@ -1,48 +1,58 @@
 # AS Academy - Kotlin
 
-مرجع و Course Package اختصاصی آموزش Kotlin در مجموعه AS Academy.
+Course Package فارسی Kotlin برای مجموعه AS Academy، از مبانی زبان تا Android، Backend، Multiplatform و مباحث Production.
 
-## وضعیت پروژه
+## معماری
 
-این ریپو از صفر بر اساس معماری مشترک AS Academy ساخته می‌شود. منطق و اجزای مشترک اپ آموزشی در `as-academy-core` نگهداری می‌شوند و این ریپو فقط محتوای اختصاصی Kotlin، مثال‌ها، تمرین‌ها، پروژه‌ها، متادیتای دوره و قابلیت‌های ویژه این زبان را نگه می‌دارد.
+این ریپو مصرف‌کننده `AS-Academy-Core` است. Navigation، Design System، Database infrastructure، Progress، Quiz/Exercise/Project engines، Search، Bookmark، Glossary، Settings، Profile/Drawer، Content/Update/Backup و Code Runner framework در Core قرار دارند و در اینجا کپی نمی‌شوند.
 
-## مسیر آموزشی
+این ریپو فقط Course Package، درس‌ها، مثال‌ها، تمرین‌ها، Quizها، پروژه‌ها، Solutionهای آموزشی، Glossary، Branding و configuration اختصاصی Kotlin را نگه می‌دارد.
 
-1. **مبانی** - نصب، اولین برنامه، متغیرها، انواع داده، عملگرها، ورودی/خروجی، شرط‌ها، حلقه‌ها، توابع، Null Safety و String.
-2. **مقدماتی** - Collections، Lambda، OOP، Data/Enum Classes، Inheritance/Interface، Extensions، Exception Handling، File I/O، Modules و Testing.
-3. **پیشرفته** - Generics، Sealed Types، Scope Functions، Delegation، Inline/Reified، Coroutines، Flow، Channels، Gradle Kotlin DSL، DSL Design، Reflection، Java Interop و Performance.
-4. **تخصصی** - Android، Jetpack Compose، Ktor، Spring Boot، Kotlin Multiplatform، Compose Multiplatform، Kotlin/JS، Kotlin/Native، Database، Architecture، Security، CI/CD و Production Readiness.
+## مسیر دوره
 
-## وابستگی به Core
+1. **مبانی** — ابزارها، syntax، type system پایه، Null Safety، control flow و function.
+2. **مقدماتی** — Collections، functional style، OOP، encapsulation، extension، exception، file و testing.
+3. **پیشرفته** — Generics/Variance، Sealed Types، Delegation، Inline/Reified، Coroutines، Flow، Channels/Mutex، Gradle/DSL، Reflection/Interop/Performance.
+4. **تخصصی** — Android/Compose/Room/Offline-first، Ktor/Spring/Database/Auth، KMP/Compose Multiplatform، JS/Native، Architecture، Security، CI/CD و Observability.
 
-متعلق به `as-academy-core`: Navigation، Drawer، Profile، Design System، Theme، Database infrastructure، Progress، Bookmark، Search، Quiz/Exercise Engine، Settings، Content Engine، Updater و Course schema.
-
-متعلق به `as-academy-kotlin`: متن درس‌ها، مثال‌های Kotlin، تمرین‌ها و آزمون‌های اختصاصی، پروژه‌ها، Branding، metadata و قابلیت‌های خاص Kotlin.
-
-## ساختار پیشنهادی
+## ساختار
 
 ```text
-as-academy-kotlin/
-├── README.md
+AS-Academy-Kotlin/
 ├── course/
+│   ├── manifest.json
 │   ├── course.json
-│   ├── basics/
-│   ├── beginner/
-│   ├── advanced/
-│   └── specialist/
+│   ├── levels.json
+│   ├── chapters.json
+│   ├── lessons/
+│   ├── exercises/
+│   ├── quizzes/
+│   ├── projects/
+│   ├── glossary/
+│   ├── branding/
+│   └── assets/
 ├── examples/
-├── exercises/
-├── projects/
-├── assets/
+├── solutions/
 ├── docs/
-│   ├── course-outline.md
-│   ├── authoring-guide.md
-│   └── core-integration.md
-└── .github/workflows/validate-course.yml
+├── tools/validate_course.py
+├── .github/workflows/validate-course.yml
+└── CHANGELOG.md
 ```
 
-## منابع فنی پایه
+## کنترل کیفیت
 
-Kotlin Documentation، Kotlin Getting Started، Kotlin Releases، JetBrains Academy Kotlin Course Template و Kotlin official examples.
+CI تمام JSONها، فایل‌های الزامی، یکتایی Stable ID و referenceهای level/chapter/lesson/project را بررسی می‌کند. برای اجرای محلی:
 
-نسخه مرجع اولیه دوره بر مبنای Kotlin 2.4.x تنظیم شده است.
+```bash
+python3 tools/validate_course.py
+```
+
+## قرارداد محتوا
+
+Stable IDهای منتشرشده تغییر نمی‌کنند. هر قابلیت مشترک جدید باید ابتدا در `AS-Academy-Core` پیاده‌سازی شود. تغییر محتوای Kotlin طبق SemVer در `course/manifest.json` و `CHANGELOG.md` نسخه‌گذاری می‌شود.
+
+## منابع مرجع
+
+مستندات رسمی Kotlin و Kotlin Releases، Android/Jetpack Compose، Ktor، Spring و Kotlin Multiplatform منابع اصلی بازبینی فنی این Course Package هستند.
+
+Reference language line: Kotlin 2.4.x.
