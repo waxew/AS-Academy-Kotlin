@@ -1,1 +1,79 @@
-{"id":"kt-spc-008","chapterId":"kt-spc-01","title":"Android Testing، Performance و Accessibility","order":44,"durationMin":120,"objectives":["unit/UI test pyramid","Compose testing","baseline/profile mindset","accessibility semantics"],"blocks":[{"type":"LIST","items":["منطق دامنه را unit test کنید","flowهای بحرانی را integration/UI test کنید","jank و startup را اندازه‌گیری کنید","content description/semantics و اندازه touch target را بررسی کنید"]}]} 
+{
+  "id": "kt-spc-008",
+  "chapterId": "kt-spc-01",
+  "title": "Android Testing، Performance و Accessibility",
+  "order": 44,
+  "durationMin": 190,
+  "objectives": [
+    "طراحی test pyramid بر اساس ریسک",
+    "تست Compose semantics و navigation",
+    "اندازه‌گیری startup، jank و allocation",
+    "تشخیص recomposition و state performance issues",
+    "طراحی UI قابل استفاده با TalkBack و keyboard/switch access"
+  ],
+  "blocks": [
+    {
+      "type": "PARAGRAPH",
+      "text": "کیفیت Android فقط با unit test سنجیده نمی‌شود. یک نسخه production باید correctness، performance و accessibility را هم‌زمان پوشش دهد و برای flowهای بحرانی evidence قابل تکرار داشته باشد."
+    },
+    {
+      "type": "SUBTITLE",
+      "text": "Test strategy"
+    },
+    {
+      "type": "LIST",
+      "items": [
+        "Domain logic: unit test سریع و deterministic.",
+        "Repository/Database: integration test برای query، transaction و migration.",
+        "Compose: semantics-based UI test؛ به متن/role/testTag پایدار تکیه کنید.",
+        "Critical journeys: تست end-to-end محدود برای شروع برنامه، بازکردن درس، آزمون و ذخیره progress.",
+        "Regression: هر bug مهم باید حداقل یک تست جلوگیری از بازگشت داشته باشد."
+      ]
+    },
+    {
+      "type": "CODE",
+      "language": "kotlin",
+      "code": "composeTestRule\n    .onNodeWithText(\"شروع آزمون\")\n    .assertIsDisplayed()\n    .performClick()"
+    },
+    {
+      "type": "SUBTITLE",
+      "text": "Performance engineering"
+    },
+    {
+      "type": "LIST",
+      "items": [
+        "startup را به cold/warm/hot تفکیک و روی build نزدیک production اندازه‌گیری کنید.",
+        "frame time و jank را در scroll/navigation واقعی اندازه بگیرید.",
+        "allocation و memory growth را برای leak و churn بررسی کنید.",
+        "در Compose از state پایدار، key مناسب و جلوگیری از کار سنگین داخل composition استفاده کنید.",
+        "Baseline Profile و Macrobenchmark را برای flowهای مهم در نظر بگیرید."
+      ]
+    },
+    {
+      "type": "WARNING",
+      "text": "بهینه‌سازی بدون اندازه‌گیری ممکن است کد را پیچیده‌تر کند بدون اینکه bottleneck واقعی را تغییر دهد. ابتدا baseline، سپس تغییر و دوباره اندازه‌گیری کنید."
+    },
+    {
+      "type": "SUBTITLE",
+      "text": "Accessibility"
+    },
+    {
+      "type": "LIST",
+      "items": [
+        "عنصر interactive باید role و label قابل فهم داشته باشد.",
+        "تصویر تزئینی نباید برای screen reader نویز ایجاد کند.",
+        "touch target مناسب و ترتیب focus منطقی حفظ شود.",
+        "اطلاعات فقط با رنگ منتقل نشود.",
+        "RTL، بزرگ شدن فونت و متن طولانی فارسی تست شود."
+      ]
+    },
+    {
+      "type": "EXERCISE",
+      "text": "برای یک صفحه آموزشی Compose یک quality lab اجرا کنید: unit test ViewModel، UI test مسیر اصلی، بررسی TalkBack semantics، اندازه‌گیری startup و scroll jank و ثبت قبل/بعد یک بهینه‌سازی."
+    },
+    {
+      "type": "IMPORTANT",
+      "text": "Performance و accessibility باید quality gate باشند؛ نه کاری که فقط قبل از انتشار نهایی به پروژه اضافه شود."
+    }
+  ]
+}
