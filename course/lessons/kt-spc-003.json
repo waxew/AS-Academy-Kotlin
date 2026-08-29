@@ -1,1 +1,19 @@
-{"id":"kt-spc-003","chapterId":"kt-spc-03","title":"Kotlin Multiplatform و Production Readiness","order":18,"durationMin":130,"objectives":["source sets","expect/actual","shared domain/data","CI/CD","observability"],"blocks":[{"type":"PARAGRAPH","text":"در KMP فقط منطق واقعاً قابل اشتراک را share کنید. UI و integrationهای platform-specific را بر اساس هزینه نگهداری و نیاز محصول انتخاب کنید."},{"type":"LIST","items":["commonMain برای منطق مشترک","platform source sets برای integration","تست در commonTest و platform tests","CI برای build/test هر target","logging، metrics و crash reporting در production"]}]}
+{
+ "id":"kt-spc-003","chapterId":"kt-spc-03","title":"Kotlin Multiplatform در سطح Production","order":18,"durationMin":220,
+ "objectives":["source-set architecture","expect/actual boundaries","shared domain/data","platform integration","multi-target testing/release"],
+ "blocks":[
+  {"type":"PARAGRAPH","text":"هدف KMP بیشینه کردن درصد کد مشترک نیست؛ هدف کاهش duplication با حفظ معماری طبیعی هر platform است. domain rule، serialization، networking و بخشی از data layer معمولاً کاندیدای مناسب‌تری برای اشتراک هستند تا integrationهای عمیق platform."},
+  {"type":"SUBTITLE","text":"Source sets"},
+  {"type":"LIST","items":["commonMain: منطق مستقل از platform","commonTest: تست قراردادهای مشترک","androidMain/iosMain/jvmMain: integrationهای واقعی platform","source set میانی برای اشتراک بین چند target مرتبط"]},
+  {"type":"SUBTITLE","text":"expect/actual"},
+  {"type":"CODE","language":"kotlin","code":"// commonMain\nexpect class PlatformClock { fun nowMillis(): Long }\n\n// androidMain\nactual class PlatformClock {\n    actual fun nowMillis(): Long = System.currentTimeMillis()\n}"},
+  {"type":"PARAGRAPH","text":"expect/actual را برای boundaryهای کوچک استفاده کنید. اگر abstraction بزرگ و پر از تفاوت platform شد، interface در common و dependency injection اغلب انعطاف بیشتری می‌دهد."},
+  {"type":"SUBTITLE","text":"Concurrency و data"},
+  {"type":"LIST","items":["Coroutine scope ownership را صریح کنید.","shared state را immutable یا synchronized طراحی کنید.","network DTO و domain model را جدا نگه دارید.","cache/persistence strategy هر platform را پشت contract مشترک قرار دهید."]},
+  {"type":"SUBTITLE","text":"Testing matrix"},
+  {"type":"LIST","items":["commonTest برای domain contract","platform test برای actual implementation","serialization compatibility test","network fake/contract test","CI باید تمام targetهای پشتیبانی‌شده را build/test کند"]},
+  {"type":"WARNING","text":"اشتراک UI یا data layer فقط به دلیل امکان فنی، تصمیم معماری خوبی نیست. هزینه debugging، native integration، release cadence و مهارت تیم را در تصمیم share/not-share لحاظ کنید."},
+  {"type":"EXERCISE","text":"یک Notes KMP طراحی کنید: domain و sync contract در commonMain، clock/storage abstraction، Android و iOS implementation، common tests و platform tests. سپس تصمیم‌های share/not-share را در ADR مستند کنید."},
+  {"type":"IMPORTANT","text":"موفقیت KMP با درصد shared code سنجیده نمی‌شود؛ با کاهش هزینه توسعه و حفظ کیفیت تجربه هر platform سنجیده می‌شود."}
+ ]
+}
