@@ -1,1 +1,81 @@
-{"id":"kt-spc-009","chapterId":"kt-spc-02","title":"Backend Resilience، Cache و Observability","order":45,"durationMin":115,"objectives":["timeout/retry","idempotency","cache","metrics/tracing"],"blocks":[{"type":"IMPORTANT","text":"Retry بدون idempotency و backoff می‌تواند بار و خطای سیستم را تشدید کند."},{"type":"LIST","items":["timeout در مرز remote call","retry محدود با backoff","idempotency key برای عملیات حساس","cache policy با invalidation روشن","structured logs و correlation id"]}]} 
+{
+  "id": "kt-spc-009",
+  "chapterId": "kt-spc-02",
+  "title": "Backend Resilience، Cache و Observability",
+  "order": 45,
+  "durationMin": 180,
+  "objectives": [
+    "طراحی timeout budget برای زنجیره فراخوانی‌ها",
+    "تشخیص عملیات idempotent و سیاست retry امن",
+    "پیاده‌سازی exponential backoff همراه jitter",
+    "طراحی cache policy و invalidation",
+    "استفاده از structured logging، metrics و tracing برای عیب‌یابی production"
+  ],
+  "blocks": [
+    {
+      "type": "PARAGRAPH",
+      "text": "Resilience یعنی سرویس در برابر latency، خطای موقت، overload و failure سرویس‌های وابسته رفتار کنترل‌شده داشته باشد. هدف حذف همه خطاها نیست؛ هدف محدود کردن blast radius و قابل پیش‌بینی کردن failure است."
+    },
+    {
+      "type": "SUBTITLE",
+      "text": "Timeout budget و deadline propagation"
+    },
+    {
+      "type": "PARAGRAPH",
+      "text": "برای هر remote call یک timeout مستقل و برای کل request یک deadline در نظر بگیرید. timeout داخلی نباید از بودجه زمانی باقی‌مانده request بزرگ‌تر باشد. در زنجیره A→B→C، اگر A فقط دو ثانیه بودجه دارد، B نباید سه ثانیه منتظر C بماند."
+    },
+    {
+      "type": "CODE",
+      "language": "kotlin",
+      "code": "suspend fun loadOrder(id: String): Order =\n    withTimeout(1_500) { api.getOrder(id) }"
+    },
+    {
+      "type": "SUBTITLE",
+      "text": "Retry، backoff و idempotency"
+    },
+    {
+      "type": "IMPORTANT",
+      "text": "Retry کورکورانه می‌تواند outage کوچک را به retry storm تبدیل کند. فقط خطاهای transient را retry کنید، تعداد تلاش را محدود کنید و برای عملیات non-idempotent بدون idempotency key تکرار خودکار انجام ندهید."
+    },
+    {
+      "type": "CODE",
+      "language": "kotlin",
+      "code": "suspend fun <T> retryTransient(block: suspend () -> T): T {\n    var delayMs = 200L\n    repeat(3) { attempt ->\n        try { return block() } catch (e: IOException) {\n            if (attempt == 2) throw e\n            delay(delayMs + Random.nextLong(0, 100))\n            delayMs *= 2\n        }\n    }\n    error(\"unreachable\")\n}"
+    },
+    {
+      "type": "SUBTITLE",
+      "text": "Cache design"
+    },
+    {
+      "type": "LIST",
+      "items": [
+        "TTL را بر اساس freshness requirement انتخاب کنید، نه یک عدد تصادفی.",
+        "برای cache-aside، miss و stampede را مدیریت کنید.",
+        "negative caching برای خطاهای دائمی می‌تواند فشار را کم کند.",
+        "cache key باید تمام ورودی‌های مؤثر بر نتیجه را پوشش دهد.",
+        "invalidation، versioning و ownership داده را قبل از production مشخص کنید."
+      ]
+    },
+    {
+      "type": "SUBTITLE",
+      "text": "Observability"
+    },
+    {
+      "type": "LIST",
+      "items": [
+        "Log: رخداد قابل جستجو با timestamp، severity و correlationId.",
+        "Metric: نرخ request، error rate، latency percentile و saturation.",
+        "Trace: مسیر یک request بین سرویس‌ها و spanهای کند یا خطادار.",
+        "Alert باید روی symptom کاربر و SLO متمرکز باشد، نه صرفاً هر exception."
+      ]
+    },
+    {
+      "type": "EXERCISE",
+      "text": "Resilient Client را بسازید: timeout، retry محدود با exponential backoff+jitter، idempotency guard، cache و metrics hook. سپس failureهای timeout، HTTP 503 و duplicate request را تست کنید."
+    },
+    {
+      "type": "WARNING",
+      "text": "catch(Exception) و retry همه خطاها، timeoutهای بسیار بزرگ، cache بدون invalidation و log کردن secret/token از anti-patternهای production هستند."
+    }
+  ]
+}
