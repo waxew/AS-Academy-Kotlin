@@ -1,1 +1,19 @@
-{"id":"kt-adv-002","chapterId":"kt-adv-02","title":"Coroutines و Structured Concurrency","order":13,"durationMin":90,"objectives":["suspend","CoroutineScope","Job/Dispatcher","Cancellation"],"blocks":[{"type":"CODE","language":"kotlin","code":"suspend fun loadUser(): User {\n    delay(100)\n    return User(1, \"Sara\")\n}"},{"type":"IMPORTANT","text":"Coroutine بدون lifecycle/owner مشخص نسازید. Structured concurrency باید عمر کار async را به scope والد متصل نگه دارد."}]}
+{
+ "id":"kt-adv-002","chapterId":"kt-adv-02","title":"Coroutines و Structured Concurrency عمیق","order":13,"durationMin":190,
+ "objectives":["suspend semantics","scope/job hierarchy","dispatcher selection","cooperative cancellation","exception supervision"],
+ "blocks":[
+  {"type":"PARAGRAPH","text":"suspend به معنی اجرای خودکار روی background thread نیست. تابع suspend می‌تواند بدون block کردن thread متوقف و ادامه داده شود؛ dispatcher و scope مشخص می‌کنند کار کجا و تا چه زمانی زنده است."},
+  {"type":"SUBTITLE","text":"Structured concurrency"},
+  {"type":"CODE","language":"kotlin","code":"suspend fun dashboard(): Dashboard = coroutineScope {\n    val user = async { loadUser() }\n    val orders = async { loadOrders() }\n    Dashboard(user.await(), orders.await())\n}"},
+  {"type":"PARAGRAPH","text":"coroutineScope تا پایان فرزندان خود کامل نمی‌شود. failure یک child به طور پیش‌فرض parent و siblingها را cancel می‌کند؛ این رفتار ownership را صریح و leak را محدود می‌کند."},
+  {"type":"SUBTITLE","text":"Cancellation"},
+  {"type":"LIST","items":["Cancellation cooperative است.","توابع suspending استاندارد cancellation را بررسی می‌کنند.","loopهای CPU-bound باید isActive/yield را بررسی کنند.","CancellationException را به عنوان خطای business نبلعید.","cleanup حساس را در finally انجام دهید."]},
+  {"type":"SUBTITLE","text":"Dispatchers"},
+  {"type":"LIST","items":["Default برای CPU-bound","IO برای blocking I/O","Main برای UI","با withContext فقط وقتی boundary واقعی execution وجود دارد dispatcher عوض کنید."]},
+  {"type":"SUBTITLE","text":"Exception و supervision"},
+  {"type":"PARAGRAPH","text":"اگر failure یک child نباید sibling مستقل را متوقف کند، supervisorScope یا SupervisorJob مناسب است؛ اما supervision نباید خطا را مخفی کند. هر failure باید ownership و reporting مشخص داشته باشد."},
+  {"type":"CODE","language":"kotlin","code":"suspend fun refreshWidgets() = supervisorScope {\n    val weather = async { runCatching { loadWeather() } }\n    val news = async { runCatching { loadNews() } }\n    weather.await() to news.await()\n}"},
+  {"type":"WARNING","text":"GlobalScope، scope بدون lifecycle، catch(Exception) برای بلعیدن cancellation و launchهای بدون owner از anti-patternهای رایج هستند."},
+  {"type":"EXERCISE","text":"یک dashboard loader بسازید که دو درخواست موازی دارد، timeout کلی، cancellation، partial failure با supervision و تست virtual-time را پوشش دهد."}
+ ]
+}
