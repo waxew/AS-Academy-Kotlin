@@ -1,1 +1,19 @@
-{"id":"kt-spc-002","chapterId":"kt-spc-02","title":"Backend با Ktor و Spring Boot","order":17,"durationMin":120,"objectives":["REST API","serialization","auth","persistence","test/deploy"],"blocks":[{"type":"CODE","language":"kotlin","code":"routing {\n    get(\"/health\") { call.respondText(\"OK\") }\n}"},{"type":"WARNING","text":"هیچ secret یا credential را در سورس commit نکنید؛ از secret management محیط استقرار استفاده کنید."}]}
+{
+ "id":"kt-spc-002","chapterId":"kt-spc-02","title":"Backend Production با Ktor و Spring Boot","order":17,"durationMin":220,
+ "objectives":["REST contract","validation/error mapping","authentication/authorization","persistence/transactions","integration testing/deployment"],
+ "blocks":[
+  {"type":"PARAGRAPH","text":"Backend production باید contract پایدار، validation مرزی، خطای قابل ماشین‌خواندن، authorization صریح، transaction درست و observability داشته باشد. framework انتخابی جای این اصول را نمی‌گیرد."},
+  {"type":"SUBTITLE","text":"API contract و routing"},
+  {"type":"CODE","language":"kotlin","code":"routing {\n    route(\"/api/v1/orders\") {\n        get(\"/{id}\") {\n            val id = call.parameters[\"id\"] ?: return@get call.respond(HttpStatusCode.BadRequest)\n            call.respond(service.find(id))\n        }\n    }\n}"},
+  {"type":"LIST","items":["DTO را از domain model جدا کنید.","status code و error schema را بخشی از contract بدانید.","pagination/sorting را deterministic طراحی کنید.","validation را قبل از ورود داده نامعتبر به domain انجام دهید.","برای تغییرات concurrent سیاست optimistic locking یا معادل آن تعریف کنید."]},
+  {"type":"SUBTITLE","text":"Authentication و Authorization"},
+  {"type":"PARAGRAPH","text":"Authentication فقط هویت را ثابت می‌کند؛ authorization تعیین می‌کند این هویت چه عملی مجاز است. کنترل دسترسی را در سمت server اعمال کنید و به پنهان بودن دکمه در client اعتماد نکنید."},
+  {"type":"WARNING","text":"password، token، database URL و signing secret را در repository یا log قرار ندهید. secret rotation و least privilege را بخشی از طراحی بدانید."},
+  {"type":"SUBTITLE","text":"Persistence و transaction"},
+  {"type":"LIST","items":["transaction boundary را مطابق use case تعریف کنید.","N+1 query و queryهای بدون index را با measurement پیدا کنید.","migration دیتابیس باید versioned و تست‌شده باشد.","connection pool را بر اساس ظرفیت DB و concurrency تنظیم کنید."]},
+  {"type":"SUBTITLE","text":"Testing و deployment"},
+  {"type":"LIST","items":["unit test برای domain","integration test برای route+serialization+persistence","contract test برای API حساس","health/readiness endpoint","graceful shutdown","structured log + metrics + trace"]},
+  {"type":"EXERCISE","text":"یک Orders API production-grade بسازید: CRUD، validation، typed errors، pagination، auth boundary، transaction، migration، integration tests، correlation id و health/readiness. duplicate request و concurrent update را نیز تست کنید."},
+  {"type":"IMPORTANT","text":"HTTP 200 گرفتن به معنی production-ready بودن API نیست؛ امنیت، سازگاری contract، داده، failure handling و عملیات استقرار بخشی از تعریف Done هستند."}
+ ]
+}
