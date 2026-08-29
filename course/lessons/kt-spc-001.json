@@ -1,1 +1,20 @@
-{"id":"kt-spc-001","chapterId":"kt-spc-01","title":"Android و Jetpack Compose","order":16,"durationMin":120,"objectives":["Compose state","ViewModel","Navigation","Room","Architecture"],"blocks":[{"type":"CODE","language":"kotlin","code":"@Composable\nfun Greeting(name: String) {\n    Text(\"سلام $name\")\n}"},{"type":"IMPORTANT","text":"UI state را immutable مدل کنید، business logic را خارج از Composable نگه دارید و persistence/network را پشت abstraction قرار دهید."}]}
+{
+  "id":"kt-spc-001","chapterId":"kt-spc-01","title":"Android و Jetpack Compose در سطح Production","order":16,"durationMin":210,
+  "objectives":["state hoisting و UDF","ViewModel و lifecycle","Navigation و state restoration","Room integration","performance و accessibility"],
+  "blocks":[
+    {"type":"PARAGRAPH","text":"در Compose حرفه‌ای، UI تابعی از state است. Composable باید تا حد ممکن بدون business logic باشد؛ ViewModel state را تولید می‌کند و eventها را به use case/repository می‌فرستد. این جریان یک‌طرفه، تست و debugging را ساده می‌کند."},
+    {"type":"SUBTITLE","text":"UiState و event contract"},
+    {"type":"CODE","language":"kotlin","code":"data class TasksUiState(\n    val loading: Boolean = false,\n    val items: List<Task> = emptyList(),\n    val error: String? = null\n)\n\nsealed interface TasksEvent {\n    data class Toggle(val id: Long) : TasksEvent\n    data object Retry : TasksEvent\n}"},
+    {"type":"LIST","items":["state را immutable نگه دارید.","event را به intent کاربر نزدیک نگه دارید.","Context/Activity را داخل ViewModel ذخیره نکنید.","برای state قابل بازیابی از SavedStateHandle یا persistence مناسب استفاده کنید.","one-off event را با state دائمی اشتباه نگیرید."]},
+    {"type":"SUBTITLE","text":"Lifecycle-aware collection"},
+    {"type":"CODE","language":"kotlin","code":"@Composable\nfun TasksRoute(vm: TasksViewModel) {\n    val state by vm.uiState.collectAsStateWithLifecycle()\n    TasksScreen(state = state, onEvent = vm::onEvent)\n}"},
+    {"type":"SUBTITLE","text":"Navigation و modular UI"},
+    {"type":"PARAGRAPH","text":"Route-level composable وابستگی به ViewModel/navigation را نگه می‌دارد و Screen-level composable فقط state و callback دریافت می‌کند. این جداسازی preview، screenshot test و reuse را آسان‌تر می‌کند."},
+    {"type":"SUBTITLE","text":"Performance"},
+    {"type":"LIST","items":["کار I/O یا parsing سنگین را داخل composition اجرا نکنید.","برای LazyColumn از key پایدار استفاده کنید.","derivedStateOf را فقط وقتی محاسبه derived پرهزینه یا پرتکرار است استفاده کنید.","recomposition را با ابزار اندازه‌گیری بررسی کنید؛ حدس نزنید.","startup و jank را روی release-like build بسنجید."]},
+    {"type":"SUBTITLE","text":"Accessibility و RTL"},
+    {"type":"LIST","items":["semantic label و role برای کنترل‌های تعاملی","touch target مناسب","عدم انتقال مفهوم فقط با رنگ","پشتیبانی font scaling","تست RTL فارسی و ترتیب focus"]},
+    {"type":"EXERCISE","text":"یک feature کامل Tasks بسازید: Room + repository + ViewModel/StateFlow + Compose + Navigation. process recreation، empty/error/loading، RTL، accessibility و تست state transition/UI را پوشش دهید."},
+    {"type":"IMPORTANT","text":"Composable نباید repository را مستقیم صدا بزند. UI، state holder، domain و data boundary را قابل تست و قابل جایگزینی نگه دارید."}
+  ]
+}
