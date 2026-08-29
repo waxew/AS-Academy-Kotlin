@@ -5,10 +5,11 @@ on:
   pull_request:
 
 jobs:
-  validate-json:
+  validate-course:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Validate JSON syntax
         shell: bash
         run: |
@@ -17,7 +18,8 @@ jobs:
             echo "Validating $file"
             jq empty "$file"
           done
-      - name: Required package files
+
+      - name: Required package structure
         shell: bash
         run: |
           test -f course/manifest.json
@@ -30,3 +32,6 @@ jobs:
           test -d course/projects
           test -d course/glossary
           test -d course/branding
+
+      - name: Stable IDs and references
+        run: python3 tools/validate_course.py
