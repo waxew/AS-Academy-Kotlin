@@ -1,1 +1,19 @@
-{"id":"kt-adv-003","chapterId":"kt-adv-02","title":"Flow، StateFlow و SharedFlow","order":14,"durationMin":90,"objectives":["cold flow","state stream","event stream","backpressure concepts"],"blocks":[{"type":"CODE","language":"kotlin","code":"fun numbers() = flow {\n    for (i in 1..3) emit(i)\n}\n\nval state = MutableStateFlow(0)"}]}
+{
+ "id":"kt-adv-003","chapterId":"kt-adv-02","title":"Flow، StateFlow و SharedFlow عمیق","order":14,"durationMin":200,
+ "objectives":["cold/hot streams","operator cancellation","StateFlow state modeling","SharedFlow event semantics","buffer/backpressure"],
+ "blocks":[
+  {"type":"PARAGRAPH","text":"Flow یک abstraction برای stream asynchronous است. cold Flow برای هر collector producer را دوباره اجرا می‌کند؛ StateFlow و SharedFlow hot هستند و lifecycle مستقل‌تری از collector دارند."},
+  {"type":"SUBTITLE","text":"Cold Flow"},
+  {"type":"CODE","language":"kotlin","code":"fun search(query: Flow<String>): Flow<List<Item>> = query\n    .debounce(300)\n    .map(String::trim)\n    .distinctUntilChanged()\n    .flatMapLatest { repository.search(it) }"},
+  {"type":"PARAGRAPH","text":"flatMapLatest هنگام query جدید کار قبلی را cancel می‌کند و برای search مناسب است. در مقابل flatMapMerge برای concurrency و flatMapConcat برای ترتیب سریالی مناسب‌ترند."},
+  {"type":"SUBTITLE","text":"StateFlow"},
+  {"type":"CODE","language":"kotlin","code":"private val _state = MutableStateFlow(SearchUiState())\nval state: StateFlow<SearchUiState> = _state.asStateFlow()\n\nfun setQuery(value: String) {\n    _state.update { it.copy(query = value) }\n}"},
+  {"type":"LIST","items":["StateFlow همیشه current value دارد.","برای state قابل مشاهده مناسب است.","state را immutable نگه دارید.","MutableStateFlow را از consumer پنهان کنید."]},
+  {"type":"SUBTITLE","text":"SharedFlow و event"},
+  {"type":"PARAGRAPH","text":"SharedFlow برای multicast stream مناسب است. replay، extraBufferCapacity و overflow policy semantics تحویل را تغییر می‌دهند. برای event حیاتی که نباید با process death از دست برود، persistence/state معمولاً انتخاب مطمئن‌تری از event transient است."},
+  {"type":"SUBTITLE","text":"Backpressure و buffer"},
+  {"type":"LIST","items":["buffer producer و consumer را تا حدی جدا می‌کند.","conflate intermediate value را برای latest-state scenario حذف می‌کند.","collectLatest هنگام value جدید body قبلی را cancel می‌کند.","buffer بزرگ مشکل طراحی را پنهان نکند؛ latency و memory را اندازه بگیرید."]},
+  {"type":"WARNING","text":"هر رخداد UI را SharedFlow نکنید و هر stream را StateFlow نکنید. ابتدا semantics موردنیاز: state، event، replay، durability و cancellation را مشخص کنید."},
+  {"type":"EXERCISE","text":"جستجوی reactive بسازید: debounce، distinct، flatMapLatest، loading/error state، retry کنترل‌شده و تست virtual-time. سپس رفتار slow consumer را با buffer/conflate مقایسه کنید."}
+ ]
+}
