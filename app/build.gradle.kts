@@ -15,7 +15,47 @@ android {
         versionName = "1.0.0"
     }
 
-    buildFeatures { compose = true }
+    // Release signing is intentionally external to source control.
+    // Keeping the same keystore for every future version is what makes APK updates installable.
+    val releaseStoreFile = providers.environmentVariable("AS_RELEASE_STORE_FILE").orNull
+    val releaseStorePassword = providers.environmentVariable("AS_RELEASE_STORE_PASSWORD").orNull
+    val releaseKeyAlias = providers.environmentVariable("AS_RELEASE_KEY_ALIAS").orNull
+    val releaseKeyPassword = providers.environmentVariable("AS_RELEASE_KEY_PASSWORD").orNull
+    val hasReleaseSigning = listOf(
+        releaseStoreFile,
+        releaseStorePassword,
+        releaseKeyAlias,
+        releaseKeyPassword
+    ).all { !it.isNullOrBlank() }
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(requireNotNull(releaseStoreFile))
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
+    buildTypes {
+        getByName("debug") {
+            // Debug remains separate from the publish signing identity.
+            isDebuggable = true
+        }
+        getByName("release") {
+            isMinifyEnabled = false
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
