@@ -4,5 +4,7 @@
  {"id":"kt-prj-003","levelId":"kt-adv","title":"Async Data Aggregator","deliverables":["چند data source","coroutines","Flow state","timeout/retry","tests"],"skills":["coroutines","flow","sealed types","architecture"]},
  {"id":"kt-prj-004","levelId":"kt-spc","title":"Android Task Manager","deliverables":["Compose UI","ViewModel","Room","Navigation","tests"],"skills":["android","compose","room","stateflow"]},
  {"id":"kt-prj-005","levelId":"kt-spc","title":"Ktor REST Service","deliverables":["CRUD","validation","auth-ready structure","persistence","integration tests","Docker-ready config"],"skills":["ktor","serialization","backend","testing"]},
- {"id":"kt-prj-006","levelId":"kt-spc","title":"KMP Notes","deliverables":["shared domain/data","Android target","iOS-ready shared module","offline repository","CI matrix"],"skills":["kmp","architecture","testing","ci"]}
+ {"id":"kt-prj-006","levelId":"kt-spc","title":"KMP Notes","deliverables":["shared domain/data","Android target","iOS-ready shared module","offline repository","CI matrix"],"skills":["kmp","architecture","testing","ci"]},
+ {"id":"kt-prj-007","levelId":"kt-adv","title":"Modular Commerce Core","deliverables":["catalog/cart/checkout modules","public API boundaries","DI composition root","coroutine tests","build documentation"],"skills":["modularization","di","testing","gradle"]},
+ {"id":"kt-prj-008","levelId":"kt-spc","title":"Production Capstone","deliverables":["یک client یا service واقعی","database migration","security checklist","CI pipeline","observability plan","release/rollback runbook"],"skills":["architecture","security","ci-cd","operations","release-engineering"]}
 ]
