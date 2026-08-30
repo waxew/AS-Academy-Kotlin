@@ -42,24 +42,63 @@ jobs:
       - name: Build debug APK
         run: gradle :app:assembleDebug
 
-      # Produces an unsigned candidate until the persistent publish keystore is configured.
-      - name: Build release candidate APK and AAB
+      # Permanent signing is optional until the repository secrets are configured.
+      # The keystore itself is reconstructed only inside the ephemeral runner.
+      - name: Prepare permanent release signing
+        if: ${{ secrets.AS_RELEASE_KEYSTORE_BASE64 != '' }}
+        env:
+          AS_RELEASE_KEYSTORE_BASE64: ${{ secrets.AS_RELEASE_KEYSTORE_BASE64 }}
+        run: |
+          printf '%s' "$AS_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/as-academy-release.jks"
+          echo "AS_RELEASE_STORE_FILE=$RUNNER_TEMP/as-academy-release.jks" >> "$GITHUB_ENV"
+          echo "AS_RELEASE_SIGNING_ENABLED=true" >> "$GITHUB_ENV"
+
+      - name: Export release signing credentials
+        if: ${{ secrets.AS_RELEASE_KEYSTORE_BASE64 != '' }}
+        env:
+          STORE_PASSWORD: ${{ secrets.AS_RELEASE_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.AS_RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.AS_RELEASE_KEY_PASSWORD }}
+        run: |
+          echo "AS_RELEASE_STORE_PASSWORD=$STORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "AS_RELEASE_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
+          echo "AS_RELEASE_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Build release APK and AAB
         run: gradle :app:assembleRelease :app:bundleRelease
+
+      - name: Verify signed release identity
+        if: ${{ env.AS_RELEASE_SIGNING_ENABLED == 'true' }}
+        run: |
+          APK="app/build/outputs/apk/release/app-release.apk"
+          test -f "$APK"
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)
+          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee app/build/outputs/apk/release/signature-verification.txt
 
       - name: Generate checksums
         run: |
           sha256sum app/build/outputs/apk/debug/app-debug.apk > app/build/outputs/apk/debug/app-debug.apk.sha256
-          if [ -f app/build/outputs/apk/release/app-release-unsigned.apk ]; then
-            sha256sum app/build/outputs/apk/release/app-release-unsigned.apk > app/build/outputs/apk/release/app-release-unsigned.apk.sha256
-          fi
+          find app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' -print0 | while IFS= read -r -d '' file; do
+            sha256sum "$file" > "$file.sha256"
+          done
           if [ -f app/build/outputs/bundle/release/app-release.aab ]; then
             sha256sum app/build/outputs/bundle/release/app-release.aab > app/build/outputs/bundle/release/app-release.aab.sha256
           fi
 
+      - name: Write release metadata
+        run: |
+          mkdir -p app/build/outputs/release-metadata
+          {
+            echo "versionName=1.2.0"
+            echo "versionCode=12000"
+            echo "commit=${GITHUB_SHA}"
+            echo "signed=${AS_RELEASE_SIGNING_ENABLED:-false}"
+          } > app/build/outputs/release-metadata/release-info.txt
+
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: AS-Academy-Kotlin-debug
+          name: AS-Academy-Kotlin-debug-1.2.0
           path: |
             app/build/outputs/apk/debug/app-debug.apk
             app/build/outputs/apk/debug/app-debug.apk.sha256
@@ -67,13 +106,15 @@ jobs:
       - name: Upload release candidate
         uses: actions/upload-artifact@v4
         with:
-          name: AS-Academy-Kotlin-release-candidate
+          name: AS-Academy-Kotlin-release-1.2.0
           if-no-files-found: error
           path: |
             app/build/outputs/apk/release/*.apk
             app/build/outputs/apk/release/*.sha256
+            app/build/outputs/apk/release/signature-verification.txt
             app/build/outputs/bundle/release/*.aab
             app/build/outputs/bundle/release/*.sha256
+            app/build/outputs/release-metadata/release-info.txt
 
       - name: Upload lint report
         if: always()
