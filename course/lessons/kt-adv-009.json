@@ -1,1 +1,17 @@
-{"id":"kt-adv-009","chapterId":"kt-adv-01","title":"Contracts و Smart Cast پیشرفته","order":40,"durationMin":65,"objectives":["compiler reasoning","smart cast limits","contract concept"],"blocks":[{"type":"PARAGRAPH","text":"Smart cast زمانی کار می‌کند که compiler بتواند ثبات مقدار و مسیر کنترل را اثبات کند. Contracts در APIهای خاص می‌توانند اطلاعات بیشتری به compiler بدهند، اما باید با احتیاط استفاده شوند."}]} 
+{
+  "id":"kt-adv-009","chapterId":"kt-adv-01","title":"Contracts، Smart Cast و Compiler Reasoning","order":40,"durationMin":170,
+  "objectives":["smart-cast guarantees","stability analysis","nullability refinement","contract effects","safe contract design"],
+  "blocks":[
+    {"type":"PARAGRAPH","text":"Smart cast زمانی ممکن است که compiler بتواند ثابت کند reference بین check و استفاده تغییر نمی‌کند. local val معمولاً ساده‌ترین حالت است؛ property باز، getter سفارشی یا mutable state می‌تواند این تضمین را از بین ببرد."},
+    {"type":"SUBTITLE","text":"Smart cast و stability"},
+    {"type":"CODE","language":"kotlin","code":"fun length(value: Any): Int {\n    if (value is String) return value.length\n    return 0\n}"},
+    {"type":"LIST","items":["type check مسیر control-flow را refine می‌کند.","null check می‌تواند T? را در مسیر امن به T تبدیل کند.","mutable property ممکن است بین check و access تغییر کند.","برای concurrency به smart cast به عنوان synchronization تکیه نکنید."]},
+    {"type":"SUBTITLE","text":"Contracts"},
+    {"type":"PARAGRAPH","text":"Contract اطلاعاتی درباره رابطه ورودی، خروجی و invocation به compiler می‌دهد. contract باید واقعیت implementation را دقیق بیان کند؛ contract غلط می‌تواند reasoning توسعه‌دهنده را خراب کند."},
+    {"type":"CODE","language":"kotlin","code":"@OptIn(ExperimentalContracts::class)\nfun requireText(value: String?): String {\n    contract { returns() implies (value != null) }\n    requireNotNull(value)\n    return value\n}"},
+    {"type":"SUBTITLE","text":"Calls-in-place"},
+    {"type":"PARAGRAPH","text":"callsInPlace می‌تواند درباره تعداد اجرای lambda اطلاعات بدهد و در initialization/control-flow مؤثر باشد. EXACTLY_ONCE، AT_MOST_ONCE و AT_LEAST_ONCE semantics متفاوت دارند و نباید صرفاً برای راضی کردن compiler انتخاب شوند."},
+    {"type":"WARNING","text":"Contracts ابزار سطح پایین برای APIهای دقیق هستند، نه راهی برای دور زدن type system. اگر contract پیچیده‌تر از خود API شده، طراحی ساده‌تر را بررسی کنید."},
+    {"type":"EXERCISE","text":"سه helper validation طراحی کنید و بررسی کنید compiler قبل و بعد از contract چه smart castهایی انجام می‌دهد. برای هر contract، invariant و تستی بنویسید که صحت effect ادعاشده را ثابت کند."}
+  ]
+}
