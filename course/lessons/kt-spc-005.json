@@ -1,1 +1,20 @@
-{"id":"kt-spc-005","chapterId":"kt-spc-02","title":"Database، Serialization و Authentication Backend","order":28,"durationMin":110,"objectives":["SQL persistence","serialization boundary","authentication concepts","authorization"],"blocks":[{"type":"LIST","items":["ورودی API را validate کنید","password را با الگوریتم password hashing مناسب ذخیره کنید","authentication را از authorization تفکیک کنید","queryها را parameterized نگه دارید","migration دیتابیس را version کنید"]},{"type":"WARNING","text":"Token، password، API key و connection string نباید در repository قرار بگیرند."}]}
+{
+  "id":"kt-spc-005","chapterId":"kt-spc-02","title":"Database، Serialization، Authentication و Authorization","order":28,"durationMin":220,
+  "objectives":["transactional SQL persistence","DTO/domain serialization boundaries","password and token security","authentication vs authorization","migration and secret management"],
+  "blocks":[
+    {"type":"PARAGRAPH","text":"Backend production باید مرز بین transport، domain و persistence را صریح نگه دارد. JSON ورودی مستقیماً entity دیتابیس یا مدل دامنه نیست؛ هر boundary محل validation، mapping و اعمال policy است."},
+    {"type":"SUBTITLE","text":"Persistence و Transaction"},
+    {"type":"LIST","items":["queryها را parameterized نگه دارید و input را به SQL string متصل نکنید.","عملیات چندمرحله‌ای که یک invariant را حفظ می‌کنند داخل transaction قرار می‌گیرند.","constraintهای دیتابیس مکمل validation برنامه هستند.","index را بر اساس query واقعی و execution plan انتخاب کنید.","connection pool باید limit، timeout و monitoring داشته باشد."]},
+    {"type":"CODE","language":"kotlin","code":"data class CreateUserRequest(val email: String, val password: String)\ndata class UserResponse(val id: String, val email: String)\n\nfun CreateUserRequest.validate() {\n    require(email.contains('@'))\n    require(password.length >= 12)\n}"},
+    {"type":"SUBTITLE","text":"Serialization boundary"},
+    {"type":"PARAGRAPH","text":"DTO عمومی را از entity و domain model جدا کنید تا تغییر schema داخلی به قرارداد API نشت نکند. فیلدهای حساس مانند passwordHash یا internal flags هرگز نباید تصادفی serialize شوند."},
+    {"type":"SUBTITLE","text":"Authentication و Password Storage"},
+    {"type":"LIST","items":["password را plaintext یا با hash عمومی سریع ذخیره نکنید؛ از password hashing استاندارد و پارامترهای قابل ارتقا استفاده کنید.","token باید expiry، issuer/audience متناسب و validation کامل داشته باشد.","refresh/revocation strategy را برای sessionهای بلندمدت تعریف کنید.","credential و signing secret را خارج repository و در secret manager/environment امن نگه دارید."]},
+    {"type":"SUBTITLE","text":"Authorization"},
+    {"type":"PARAGRAPH","text":"Authentication می‌گوید کاربر چه کسی است؛ Authorization تعیین می‌کند چه کاری روی کدام resource مجاز است. بررسی ownership/role باید server-side و نزدیک use case حساس انجام شود."},
+    {"type":"IMPORTANT","text":"وجود JWT یا login به معنی امن بودن API نیست. IDOR، broken authorization، injection، secret leakage و migration ناقص همچنان ریسک production هستند."},
+    {"type":"SUBTITLE","text":"Migration و Recovery"},
+    {"type":"LIST","items":["هر migration versioned و قابل بازتولید باشد.","migration روی snapshot نزدیک production آزمایش شود.","backup و restore باید واقعاً تست شوند، نه فقط مستند.","برای تغییر destructive مسیر rollback یا forward-fix تعریف کنید."]},
+    {"type":"EXERCISE","text":"یک User/Order API طراحی کنید که DTO validation، transactional persistence، password hashing abstraction، authentication، resource-level authorization، migration و integration test داشته باشد. threat checklist و secret policy را نیز تحویل دهید."}
+  ]
+}
