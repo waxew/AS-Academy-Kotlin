@@ -1,1 +1,16 @@
-{"id":"kt-adv-010","chapterId":"kt-adv-02","title":"Testing Coroutines و Flow","order":41,"durationMin":85,"objectives":["virtual time","runTest","Flow assertions","cancellation test"],"blocks":[{"type":"IMPORTANT","text":"تست coroutine نباید به sleep واقعی وابسته باشد. از ابزارهای test scheduler و virtual time استفاده کنید."},{"type":"LIST","items":["success path","error path","cancellation","timeout/retry","ordering/backpressure"]}]} 
+{
+  "id":"kt-adv-010","chapterId":"kt-adv-02","title":"Testing Coroutines و Flow در سطح حرفه‌ای","order":41,"durationMin":190,
+  "objectives":["runTest و virtual time","TestDispatcher/TestScope","cancellation/timeout testing","Flow assertion strategy","deterministic retry/backpressure tests"],
+  "blocks":[
+    {"type":"PARAGRAPH","text":"تست async باید deterministic باشد. sleep واقعی، وابستگی به wall clock و raceهای زمان‌بندی باعث flaky test می‌شوند. kotlinx-coroutines-test با scheduler مجازی اجازه می‌دهد زمان را کنترل کنید."},
+    {"type":"SUBTITLE","text":"runTest و virtual time"},
+    {"type":"CODE","language":"kotlin","code":"@Test\nfun `retry succeeds on second attempt`() = runTest {\n    var calls = 0\n    val result = retrying {\n        calls++\n        if (calls == 1) error(\"temporary\")\n        \"ok\"\n    }\n    assertEquals(\"ok\", result)\n}"},
+    {"type":"LIST","items":["runTest کارهای coroutine را track می‌کند.","advanceTimeBy برای جلو بردن زمان مجازی است.","advanceUntilIdle تمام taskهای قابل اجرا را drain می‌کند.","Dispatcher را inject کنید تا test کنترل execution داشته باشد."]},
+    {"type":"SUBTITLE","text":"Cancellation و timeout"},
+    {"type":"PARAGRAPH","text":"تست cancellation باید ثابت کند child واقعاً متوقف می‌شود و cleanup اجرا می‌شود. برای timeout نیز خروجی و تعداد side-effectهای قبل/بعد از timeout را بررسی کنید."},
+    {"type":"SUBTITLE","text":"Flow testing"},
+    {"type":"LIST","items":["مقادیر اولیه و ترتیب emission را بررسی کنید.","برای StateFlow current value و transitionها را assert کنید.","برای flatMapLatest مطمئن شوید کار قبلی cancel شده است.","error/retry را با virtual time تست کنید.","slow collector و buffer policy را در سناریوهای backpressure بررسی کنید."]},
+    {"type":"WARNING","text":"تست coroutine که فقط happy path را می‌سنجد، cancellation و ordering bugها را پنهان می‌کند. async code باید failure semantics مشخص داشته باشد."},
+    {"type":"EXERCISE","text":"برای search pipeline شامل debounce، flatMapLatest، retry و timeout یک suite بنویسید: success، error، cancellation، stale-result prevention و slow-consumer behavior."}
+  ]
+}
