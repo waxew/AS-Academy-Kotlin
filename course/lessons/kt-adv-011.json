@@ -1,1 +1,17 @@
-{"id":"kt-adv-011","chapterId":"kt-adv-03","title":"Dependency Injection و Composition Root","order":42,"durationMin":75,"objectives":["constructor injection","composition root","DI framework trade-offs"],"blocks":[{"type":"CODE","language":"kotlin","code":"class UserService(\n    private val repository: UserRepository,\n    private val clock: Clock\n)"},{"type":"NOTE","text":"Dependency Injection قبل از هر framework یک اصل طراحی است؛ dependencyها را آشکار و قابل جایگزینی کنید."}]} 
+{
+  "id":"kt-adv-011","chapterId":"kt-adv-03","title":"Dependency Injection و Composition Root در معماری واقعی","order":42,"durationMin":180,
+  "objectives":["constructor injection","dependency inversion","composition root","lifetime/scoping","DI framework trade-offs"],
+  "blocks":[
+    {"type":"PARAGRAPH","text":"Dependency Injection قبل از framework یک اصل طراحی است: object نباید dependency مهم خود را مخفیانه بسازد. dependency باید از بیرون وارد شود تا coupling، lifecycle و testability قابل کنترل باشند."},
+    {"type":"CODE","language":"kotlin","code":"class UserService(\n    private val repository: UserRepository,\n    private val clock: Clock\n) {\n    fun activate(id: UserId) = repository.activate(id, clock.now())\n}"},
+    {"type":"SUBTITLE","text":"Composition Root"},
+    {"type":"PARAGRAPH","text":"Composition Root نقطه‌ای نزدیک entry point برنامه است که object graph ساخته می‌شود. domain و featureها نباید container یا service locator را بشناسند."},
+    {"type":"CODE","language":"kotlin","code":"fun createApp(): Application {\n    val database = Database.connect()\n    val repository = SqlUserRepository(database)\n    val service = UserService(repository, SystemClock)\n    return Application(service)\n}"},
+    {"type":"SUBTITLE","text":"Lifetime و scope"},
+    {"type":"LIST","items":["singleton فقط برای dependency واقعاً process-wide","feature/request scope برای state محدود","resourceهای قابل بستن lifecycle روشن داشته باشند","scope کوتاه‌تر نباید ناخواسته در singleton capture شود"]},
+    {"type":"SUBTITLE","text":"Framework trade-offs"},
+    {"type":"PARAGRAPH","text":"Frameworkهایی مانند Hilt/Dagger یا Koin wiring را ساده می‌کنند اما architecture را جایگزین نمی‌کنند. compile-time graph validation، startup cost، reflection، platform support و debugging باید مقایسه شوند."},
+    {"type":"WARNING","text":"Service Locator dependency را پنهان می‌کند و تست را سخت‌تر می‌کند. تزریق interfaceهای بسیار ریز و بی‌معنا نیز over-abstraction ایجاد می‌کند."},
+    {"type":"EXERCISE","text":"یک feature سفارش را ابتدا با manual DI و Composition Root بسازید، سپس همان graph را با یک DI framework مدل کنید و تفاوت compile-time safety، lifecycle، تست و complexity را گزارش کنید."}
+  ]
+}
