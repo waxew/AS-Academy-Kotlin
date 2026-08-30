@@ -2,10 +2,10 @@
   "courseId":"kotlin",
   "titleFa":"آموزش جامع Kotlin",
   "titleEn":"Kotlin",
-  "version":"1.1.0",
+  "version":"1.2.0",
   "contentSchemaVersion":1,
   "minimumCoreVersion":"1.0.0",
   "rtl":true,
-  "referenceLanguageVersion":"2.4.x",
+  "referenceLanguageVersion":"2.4.10",
   "capabilities":{"codeRunner":true,"terminalExamples":true,"diagrams":true,"quizzes":true,"exercises":true,"projects":true,"glossary":true}
 }
