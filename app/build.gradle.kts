@@ -11,8 +11,9 @@ android {
         applicationId = "com.asdevelopers.academy.kotlin"
         minSdk = 23
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0.0"
+        // Monotonic versionCode preserves Android update compatibility.
+        versionCode = 12000
+        versionName = "1.2.0"
     }
 
     // Release signing is intentionally external to source control.
