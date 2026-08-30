@@ -1,1 +1,19 @@
-{"id":"kt-adv-004","chapterId":"kt-adv-03","title":"Gradle Kotlin DSL، DSL Design و Java Interop","order":15,"durationMin":85,"objectives":["build.gradle.kts","type-safe builders","Java interop","multi-module design"],"blocks":[{"type":"CODE","language":"kotlin","code":"plugins {\n    kotlin(\"jvm\") version \"2.4.10\"\n}"},{"type":"NOTE","text":"Version catalog و convention plugin برای پروژه‌های چندماژوله از تکرار تنظیمات build جلوگیری می‌کنند."}]}
+{
+  "id":"kt-adv-004","chapterId":"kt-adv-03","title":"Gradle Kotlin DSL، DSL Design و Java Interop عمیق","order":15,"durationMin":200,
+  "objectives":["Gradle Kotlin DSL","type-safe DSL design","receivers and DSL markers","Java interoperability","convention plugins and build boundaries"],
+  "blocks":[
+    {"type":"PARAGRAPH","text":"Kotlin DSL فقط syntax زیباتر نیست؛ type-safe configuration، IDE completion و refactoring بهتر فراهم می‌کند. در پروژه بزرگ باید build logic نیز مانند application code معماری شود."},
+    {"type":"SUBTITLE","text":"Gradle Kotlin DSL"},
+    {"type":"CODE","language":"kotlin","code":"plugins {\n    kotlin(\"jvm\") version \"2.4.10\"\n}\n\nkotlin {\n    jvmToolchain(17)\n}"},
+    {"type":"LIST","items":["نسخه‌ها را در version catalog متمرکز کنید.","تنظیمات مشترک را به convention plugin منتقل کنید.","از cross-project configuration شکننده پرهیز کنید.","configuration cache و build scan را برای build performance بررسی کنید."]},
+    {"type":"SUBTITLE","text":"طراحی DSL"},
+    {"type":"CODE","language":"kotlin","code":"@DslMarker\nannotation class CourseDsl\n\n@CourseDsl\nclass CourseBuilder {\n    var title: String = \"\"\n    private val lessons = mutableListOf<String>()\n    fun lesson(name: String) { lessons += name }\n}"},
+    {"type":"PARAGRAPH","text":"Lambda with receiver و extension function امکان ساخت DSL خوانا را می‌دهند. DSL marker از دسترسی ناخواسته به receiver بیرونی در nesting جلوگیری می‌کند."},
+    {"type":"SUBTITLE","text":"Java Interop"},
+    {"type":"LIST","items":["platform typeهای Java را در boundary به nullable/non-null صریح تبدیل کنید.","@JvmOverloads را فقط برای API واقعاً مصرف‌شده از Java به‌کار ببرید.","@JvmStatic و @JvmField را با شناخت bytecode/API surface استفاده کنید.","checked exception و SAM conversion را در API دوطرفه در نظر بگیرید.","نام‌گذاری و overloadها باید از Java نیز قابل فهم باشند."]},
+    {"type":"SUBTITLE","text":"Build architecture"},
+    {"type":"PARAGRAPH","text":"در multi-module بزرگ، convention plugin، version catalog و module boundary پایدار از duplication و drift جلوگیری می‌کنند. build logic مشترک باید versioned و تست‌پذیر باشد."},
+    {"type":"EXERCISE","text":"یک پروژه سه‌ماژوله بسازید؛ version catalog و convention plugin اضافه کنید، یک DSL کوچک type-safe با @DslMarker طراحی کنید و API آن را از یک کلاس Java مصرف و تست کنید."},
+    {"type":"WARNING","text":"DSL بیش از حد جادویی هزینه یادگیری و debugging را بالا می‌برد. خوانایی و خطای compile-time مهم‌تر از کوتاه‌ترین syntax هستند."}
+  ]
+}
