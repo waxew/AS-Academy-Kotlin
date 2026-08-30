@@ -1,1 +1,18 @@
-{"id":"kt-adv-008","chapterId":"kt-adv-03","title":"Annotation، Reflection و Performance","order":26,"durationMin":80,"objectives":["annotation targets","reflection basics","benchmark mindset","allocation awareness"],"blocks":[{"type":"PARAGRAPH","text":"Reflection ابزار قدرتمندی است اما هزینه runtime و پیچیدگی دارد. برای مسیرهای پرتکرار ابتدا API type-safe و code generation را بررسی کنید."},{"type":"LIST","items":["قبل از optimization اندازه‌گیری کنید","allocationهای غیرضروری را شناسایی کنید","benchmark را از debug build نتیجه‌گیری نکنید","تغییر performance را همراه regression test ثبت کنید"]}]}
+{
+  "id":"kt-adv-008","chapterId":"kt-adv-03","title":"Annotations، Reflection، JVM و Performance","order":26,"durationMin":210,
+  "objectives":["annotation targets/retention","Kotlin reflection","reflection vs code generation","allocation and boxing awareness","benchmark/profiling methodology"],
+  "blocks":[
+    {"type":"SUBTITLE","text":"Annotations"},
+    {"type":"PARAGRAPH","text":"Annotation metadata می‌تواند در source، binary یا runtime نگهداری شود. target و retention باید بر اساس مصرف واقعی انتخاب شوند تا API بی‌دلیل runtime metadata حمل نکند."},
+    {"type":"CODE","language":"kotlin","code":"@Target(AnnotationTarget.CLASS)\n@Retention(AnnotationRetention.RUNTIME)\nannotation class Route(val path: String)\n\n@Route(\"/users\")\nclass UsersEndpoint"},
+    {"type":"SUBTITLE","text":"Reflection"},
+    {"type":"CODE","language":"kotlin","code":"val route = UsersEndpoint::class.annotations\n    .filterIsInstance<Route>()\n    .firstOrNull()"},
+    {"type":"PARAGRAPH","text":"Reflection برای framework، tooling و plugin system مفید است، اما dependency و runtime cost دارد. در hot path یا API با schema مشخص، code generation یا mapping صریح را بررسی کنید."},
+    {"type":"SUBTITLE","text":"JVM cost model"},
+    {"type":"LIST","items":["boxing می‌تواند برای primitiveهای generic رخ دهد.","allocation کوتاه‌عمر همیشه مشکل نیست؛ profiler تصمیم می‌گیرد.","sequence ممکن است allocation را کم یا overhead iterator را زیاد کند؛ workload تعیین‌کننده است.","inline/value class semantics و bytecode واقعی را در boundaryهای Java/nullable/generic بررسی کنید."]},
+    {"type":"SUBTITLE","text":"Benchmark و profiling"},
+    {"type":"LIST","items":["قبل از optimization baseline بگیرید.","warmup/JIT را در benchmark JVM لحاظ کنید.","microbenchmark را با performance end-to-end اشتباه نگیرید.","CPU، allocation، GC و latency distribution را جداگانه بررسی کنید.","release-like build و workload نماینده production استفاده کنید."]},
+    {"type":"WARNING","text":"نتیجه‌گیری performance از println، یک اجرای دستی یا Debug build معتبر نیست. optimization بدون measurement ممکن است code را پیچیده‌تر و حتی کندتر کند."},
+    {"type":"EXERCISE","text":"یک mapper مبتنی بر reflection و یک mapper صریح بسازید. benchmark طراحی کنید، allocation/latency را مقایسه و نتیجه را همراه محدودیت‌های آزمایش گزارش کنید."}
+  ]
+}
