@@ -1,1 +1,18 @@
-{"id":"kt-adv-012","chapterId":"kt-adv-03","title":"Modularization، API/Implementation و Build Performance","order":43,"durationMin":80,"objectives":["module boundaries","api vs implementation","incremental build"],"blocks":[{"type":"LIST","items":["مرز ماژول را بر اساس مسئولیت/ownership انتخاب کنید","dependency direction را کنترل کنید","implementation dependency را تا حد امکان مخفی نگه دارید","build scan و profiling را قبل از optimization انجام دهید"]}]} 
+{
+  "id":"kt-adv-012","chapterId":"kt-adv-03","title":"Modularization، API/Implementation و Build Performance عمیق","order":43,"durationMin":200,
+  "objectives":["module boundary design","dependency direction","api vs implementation exposure","incremental compilation","build profiling and optimization"],
+  "blocks":[
+    {"type":"PARAGRAPH","text":"Modularization هدف نیست؛ ابزار کنترل coupling، ownership، build isolation و delivery است. تعداد زیاد module بدون boundary واقعی فقط complexity ساختاری ایجاد می‌کند."},
+    {"type":"SUBTITLE","text":"انتخاب مرز ماژول"},
+    {"type":"LIST","items":["مرز را بر اساس business capability یا ownership پایدار انتخاب کنید.","dependency graph باید جهت مشخص و بدون cycle داشته باشد.","shared module را به محل dumping تبدیل نکنید.","featureهای مستقل باید contract کوچک و پایدار داشته باشند."]},
+    {"type":"SUBTITLE","text":"api در برابر implementation"},
+    {"type":"PARAGRAPH","text":"در Gradle، api dependency بخشی از compile classpath consumer می‌شود؛ implementation جزئیات داخلی را پنهان می‌کند. exposure کمتر معمولاً coupling و invalidation build را کاهش می‌دهد."},
+    {"type":"CODE","language":"kotlin","code":"dependencies {\n    api(project(\":domain-model\"))\n    implementation(project(\":networking\"))\n}"},
+    {"type":"SUBTITLE","text":"Build performance"},
+    {"type":"LIST","items":["ابتدا build scan/profile بگیرید.","configuration cache و build cache را ارزیابی کنید.","annotation/code generation سنگین را اندازه‌گیری کنید.","تغییر API عمومی می‌تواند downstream compilation بیشتری ایجاد کند.","convention plugin از configuration duplication جلوگیری می‌کند.","CI cache باید key و invalidation قابل پیش‌بینی داشته باشد."]},
+    {"type":"SUBTITLE","text":"Architecture enforcement"},
+    {"type":"PARAGRAPH","text":"Dependency rule را فقط در سند ننویسید؛ با Gradle graph checks، visibility، lint/static analysis یا architecture tests enforce کنید تا cycle و dependency ممنوع وارد main نشود."},
+    {"type":"WARNING","text":"تقسیم هر package به module مستقل معمولاً build و cognitive overhead را افزایش می‌دهد. قبل از split باید دلیل ownership، isolation یا reuse روشن باشد."},
+    {"type":"EXERCISE","text":"یک monolith نمونه را به domain، data، feature و app تقسیم کنید؛ dependency graph را رسم کنید، api/implementation را اصلاح کنید و قبل/بعد از تغییر build profile تهیه و تحلیل کنید."}
+  ]
+}
