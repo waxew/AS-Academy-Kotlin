@@ -1,1 +1,19 @@
-{"id":"kt-spc-006","chapterId":"kt-spc-03","title":"Kotlin/JS، Kotlin/Native و Target Strategy","order":29,"durationMin":90,"objectives":["شناخت JS target","Native target","انتخاب target بر اساس محصول"],"blocks":[{"type":"PARAGRAPH","text":"انتخاب target باید از نیاز محصول، کتابخانه‌های موردنیاز، تجربه تیم، tooling و هزینه نگهداری نتیجه شود؛ Multiplatform هدف نیست، ابزار کاهش duplication در جای مناسب است."},{"type":"TABLE","headers":["Target","کاربرد"],"rows":[["JVM","Backend/Desktop/Android foundations"],["JS","Browser/Node ecosystem integration"],["Native","Native binaries و platform integration"],["Multiplatform","اشتراک منطق بین targetها"]]}]}
+{
+  "id":"kt-spc-006","chapterId":"kt-spc-03","title":"Kotlin/JVM، JS، Native و Target Strategy حرفه‌ای","order":29,"durationMin":210,
+  "objectives":["JVM/JS/Native execution models","target-specific interoperability","library/tooling evaluation","source-set strategy","product-driven target selection"],
+  "blocks":[
+    {"type":"PARAGRAPH","text":"انتخاب target یک تصمیم محصول و معماری است. درصد shared code معیار موفقیت نیست؛ معیار واقعی کاهش هزینه نگهداری بدون قربانی کردن UX، قابلیت platform و کیفیت release است."},
+    {"type":"TABLE","headers":["Target","مزیت اصلی","ریسک/هزینه"],"rows":[["JVM","اکوسیستم بالغ backend و Android foundations","JVM/runtime و interoperability constraints"],["JS","دسترسی به browser/Node ecosystem","interop و package/toolchain JS"],["Native","binary native و platform API integration","tooling/interop و target-specific behavior"],["Multiplatform","اشتراک domain/data/test در targetهای مناسب","پیچیدگی source set و dependency compatibility"]]},
+    {"type":"SUBTITLE","text":"JVM Strategy"},
+    {"type":"LIST","items":["JDK/toolchain را صریح version کنید.","Java interoperability و binary compatibility را برای library API بررسی کنید.","memory/GC/JIT behavior را برای workload backend یا desktop اندازه‌گیری کنید."]},
+    {"type":"SUBTITLE","text":"Kotlin/JS"},
+    {"type":"PARAGRAPH","text":"در JS target، boundary با JavaScript ecosystem مهم است. external declarations، npm dependencyها، module format و serialization قراردادهای integration هستند و باید در CI روی target واقعی تست شوند."},
+    {"type":"SUBTITLE","text":"Kotlin/Native"},
+    {"type":"PARAGRAPH","text":"Native برای integration با platform و تولید binary native مفید است. APIهای platform-specific باید پشت abstraction کوچک بمانند تا common code به جزئیات target آلوده نشود."},
+    {"type":"SUBTITLE","text":"Source-set design"},
+    {"type":"CODE","language":"kotlin","code":"kotlin {\n    jvm()\n    js(IR) { browser() }\n    sourceSets {\n        commonMain.dependencies { /* domain/data contracts */ }\n        commonTest.dependencies { /* shared behavior tests */ }\n    }\n}"},
+    {"type":"LIST","items":["commonMain فقط منطق واقعاً مشترک را نگه دارد.","expect/actual را برای capability واقعی platform استفاده کنید، نه هر تفاوت کوچک.","dependency قبل از انتخاب باید target matrix موردنیاز را پشتیبانی کند.","CI باید حداقل compile/test targetهای ادعاشده را اجرا کند."]},
+    {"type":"WARNING","text":"افزودن target فقط برای اینکه پروژه Multiplatform نامیده شود بدهی نگهداری ایجاد می‌کند. هر target باید use case، owner، test و release path داشته باشد."},
+    {"type":"EXERCISE","text":"برای یک محصول Notes یا Commerce ماتریس JVM/JS/Native طراحی کنید. محل هر feature در common/platform source set، dependency constraints، CI matrix و معیار تصمیم برای اضافه یا حذف هر target را در ADR ثبت کنید."}
+  ]
+}
