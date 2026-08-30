@@ -9,6 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      RELEASE_KEYSTORE_BASE64: ${{ secrets.AS_RELEASE_KEYSTORE_BASE64 }}
+      RELEASE_STORE_PASSWORD: ${{ secrets.AS_RELEASE_STORE_PASSWORD }}
+      RELEASE_KEY_ALIAS: ${{ secrets.AS_RELEASE_KEY_ALIAS }}
+      RELEASE_KEY_PASSWORD: ${{ secrets.AS_RELEASE_KEY_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
@@ -42,27 +47,15 @@ jobs:
       - name: Build debug APK
         run: gradle :app:assembleDebug
 
-      # Permanent signing is optional until the repository secrets are configured.
-      # The keystore itself is reconstructed only inside the ephemeral runner.
       - name: Prepare permanent release signing
-        if: ${{ secrets.AS_RELEASE_KEYSTORE_BASE64 != '' }}
-        env:
-          AS_RELEASE_KEYSTORE_BASE64: ${{ secrets.AS_RELEASE_KEYSTORE_BASE64 }}
+        if: ${{ env.RELEASE_KEYSTORE_BASE64 != '' }}
         run: |
-          printf '%s' "$AS_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/as-academy-release.jks"
+          printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/as-academy-release.jks"
           echo "AS_RELEASE_STORE_FILE=$RUNNER_TEMP/as-academy-release.jks" >> "$GITHUB_ENV"
+          echo "AS_RELEASE_STORE_PASSWORD=$RELEASE_STORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "AS_RELEASE_KEY_ALIAS=$RELEASE_KEY_ALIAS" >> "$GITHUB_ENV"
+          echo "AS_RELEASE_KEY_PASSWORD=$RELEASE_KEY_PASSWORD" >> "$GITHUB_ENV"
           echo "AS_RELEASE_SIGNING_ENABLED=true" >> "$GITHUB_ENV"
-
-      - name: Export release signing credentials
-        if: ${{ secrets.AS_RELEASE_KEYSTORE_BASE64 != '' }}
-        env:
-          STORE_PASSWORD: ${{ secrets.AS_RELEASE_STORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.AS_RELEASE_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.AS_RELEASE_KEY_PASSWORD }}
-        run: |
-          echo "AS_RELEASE_STORE_PASSWORD=$STORE_PASSWORD" >> "$GITHUB_ENV"
-          echo "AS_RELEASE_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
-          echo "AS_RELEASE_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
 
       - name: Build release APK and AAB
         run: gradle :app:assembleRelease :app:bundleRelease
@@ -103,7 +96,7 @@ jobs:
             app/build/outputs/apk/debug/app-debug.apk
             app/build/outputs/apk/debug/app-debug.apk.sha256
 
-      - name: Upload release candidate
+      - name: Upload release build
         uses: actions/upload-artifact@v4
         with:
           name: AS-Academy-Kotlin-release-1.2.0
