@@ -1,1 +1,17 @@
-{"id":"kt-adv-007","chapterId":"kt-adv-02","title":"Channels، Mutex و Shared Mutable State","order":25,"durationMin":85,"objectives":["channel communication","mutex","race condition","state confinement"],"blocks":[{"type":"CODE","language":"kotlin","code":"val mutex = Mutex()\nvar counter = 0\n\nsuspend fun increment() {\n    mutex.withLock { counter++ }\n}"},{"type":"IMPORTANT","text":"قبل از افزودن lock، طراحی state ownership و immutable message passing را بررسی کنید."}]}
+{
+  "id":"kt-adv-007","chapterId":"kt-adv-02","title":"Channels، Mutex و Shared Mutable State عمیق","order":25,"durationMin":195,
+  "objectives":["race-condition analysis","channel communication","mutex critical sections","state confinement","actor/message-passing design"],
+  "blocks":[
+    {"type":"PARAGRAPH","text":"Coroutine به تنهایی shared state را thread-safe نمی‌کند. اگر چند coroutine یک mutable state را تغییر دهند، race condition ممکن است حتی بدون thread creation صریح رخ دهد."},
+    {"type":"SUBTITLE","text":"Mutex"},
+    {"type":"CODE","language":"kotlin","code":"private val mutex = Mutex()\nprivate var balance = 0L\n\nsuspend fun deposit(amount: Long) = mutex.withLock {\n    require(amount > 0)\n    balance += amount\n}"},
+    {"type":"PARAGRAPH","text":"critical section را کوتاه نگه دارید و I/O طولانی را داخل lock انجام ندهید. invariantهایی که باید atomically حفظ شوند باید در یک ownership boundary روشن قرار بگیرند."},
+    {"type":"SUBTITLE","text":"Channels و message passing"},
+    {"type":"CODE","language":"kotlin","code":"sealed interface CounterCommand {\n    data object Increment : CounterCommand\n}\n\nsuspend fun consume(commands: ReceiveChannel<CounterCommand>) {\n    var value = 0\n    for (command in commands) if (command is CounterCommand.Increment) value++\n}"},
+    {"type":"LIST","items":["Channel برای انتقال event/value بین coroutineهاست.","buffer capacity روی suspension و memory اثر دارد.","close/cancellation semantics باید طراحی شود.","message passing می‌تواند ownership mutable state را به یک consumer محدود کند."]},
+    {"type":"SUBTITLE","text":"State confinement"},
+    {"type":"PARAGRAPH","text":"به جای lock در چند نقطه، state را در یک owner محدود کنید و commandها را به آن ارسال کنید. این طراحی برای invariantهای پیچیده اغلب قابل فهم‌تر است."},
+    {"type":"WARNING","text":"Mutex درمان معماری مبهم نیست. nested lock، critical section طولانی و ownership نامشخص می‌تواند deadlock، starvation یا latency ایجاد کند."},
+    {"type":"EXERCISE","text":"یک wallet concurrent بسازید و سه implementation را مقایسه کنید: unsafe shared state، Mutex و single-owner message passing. با هزار عملیات موازی invariant موجودی را تست کنید."}
+  ]
+}
