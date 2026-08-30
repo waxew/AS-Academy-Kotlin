@@ -1,1 +1,14 @@
-{"id":"kt-adv-005","chapterId":"kt-adv-01","title":"Delegation و Delegated Properties","order":23,"durationMin":65,"objectives":["class delegation","lazy","observable","property delegate contract"],"blocks":[{"type":"CODE","language":"kotlin","code":"val config: String by lazy {\n    println(\"loading...\")\n    \"production\"\n}"},{"type":"NOTE","text":"Delegation برای composition و حذف boilerplate مفید است، اما ownership و side effect باید روشن باقی بماند."}]}
+{
+  "id":"kt-adv-005","chapterId":"kt-adv-01","title":"Delegation و Delegated Properties عمیق","order":23,"durationMin":170,
+  "objectives":["class delegation","property delegate protocol","lazy/observable/vetoable","custom delegates","ownership و side-effect design"],
+  "blocks":[
+    {"type":"PARAGRAPH","text":"Delegation در Kotlin ابزار composition است. به جای وراثت برای reuse رفتار، یک object می‌تواند implementation یک interface را به dependency دیگری واگذار کند."},
+    {"type":"CODE","language":"kotlin","code":"interface Logger { fun log(message: String) }\nclass ConsoleLogger : Logger { override fun log(message: String) = println(message) }\nclass Service(logger: Logger) : Logger by logger"},
+    {"type":"SUBTITLE","text":"Property delegate protocol"},
+    {"type":"PARAGRAPH","text":"یک delegate می‌تواند getValue و setValue را پیاده‌سازی کند و رفتار access به property را کنترل کند. این قابلیت برای caching، validation، persistence adapter و instrumentation مفید است."},
+    {"type":"CODE","language":"kotlin","code":"class NotBlank(private var value: String) {\n    operator fun getValue(thisRef: Any?, property: KProperty<*>) = value\n    operator fun setValue(thisRef: Any?, property: KProperty<*>, newValue: String) {\n        require(newValue.isNotBlank())\n        value = newValue\n    }\n}"},
+    {"type":"LIST","items":["lazy برای initialization یک‌باره و deferred مناسب است.","observable برای واکنش پس از تغییر value است.","vetoable می‌تواند mutation را قبل از commit رد کند.","delegate سفارشی باید ownership و thread-safety مشخص داشته باشد."]},
+    {"type":"WARNING","text":"delegateهایی با I/O پنهان یا side effect سنگین می‌توانند property access ساده را غیرقابل پیش‌بینی کنند. API باید هزینه و failure را واضح نگه دارد."},
+    {"type":"EXERCISE","text":"یک Settings delegate بسازید که validation، default value و cache داشته باشد؛ سپس class delegation را برای logging یا repository decorator پیاده‌سازی کنید و trade-off آن را با inheritance مقایسه کنید."}
+  ]
+}
