@@ -1,1 +1,23 @@
-{"id":"kt-spc-007","chapterId":"kt-spc-03","title":"Clean Architecture، Security، CI/CD و Observability","order":30,"durationMin":130,"objectives":["معماری قابل تست","secure defaults","CI pipeline","logging/metrics/tracing"],"blocks":[{"type":"LIST","items":["dependency direction را کنترل کنید","unit/integration/UI test را متناسب با ریسک انتخاب کنید","dependency و secret scanning فعال کنید","build/test را در CI اجباری کنید","structured logging و metrics تعریف کنید","release rollback strategy داشته باشید"]},{"type":"IMPORTANT","text":"Production readiness فقط compile شدن پروژه نیست؛ امنیت، migration، monitoring، recovery و عملیات release بخشی از طراحی نرم‌افزارند."}]}
+{
+  "id":"kt-spc-007","chapterId":"kt-spc-03","title":"Production Architecture، Security، CI/CD و Observability","order":30,"durationMin":260,
+  "objectives":["architecture boundaries and dependency rules","threat modeling and secure defaults","risk-based quality gates","CI/CD and supply-chain controls","logging metrics tracing and incident readiness"],
+  "blocks":[
+    {"type":"PARAGRAPH","text":"Production readiness یک ویژگی جداگانه در انتهای پروژه نیست. معماری، امنیت، تست، telemetry، migration و release strategy باید از ابتدا در definition of done حضور داشته باشند."},
+    {"type":"SUBTITLE","text":"Architecture boundaries"},
+    {"type":"LIST","items":["dependency direction را از domain به framework معکوس نکنید.","I/O و framework detail پشت adapter بماند.","module public API کوچک و explicit باشد.","business invariant در use case/domain قرار گیرد، نه UI یا controller.","architecture rule را با test یا verification خودکار enforce کنید."]},
+    {"type":"SUBTITLE","text":"Threat modeling و Secure Defaults"},
+    {"type":"LIST","items":["asset، actor، trust boundary و abuse case را قبل از انتخاب کنترل امنیتی مشخص کنید.","least privilege برای account، token و service identity اعمال شود.","input validation و output encoding در boundary مناسب انجام شود.","secret، key و credential هرگز در source یا log قرار نگیرند.","dependency و secret scanning بخشی از CI باشد.","authorization server-side و resource-level بررسی شود."]},
+    {"type":"SUBTITLE","text":"Quality strategy بر اساس ریسک"},
+    {"type":"PARAGRAPH","text":"تعداد test معیار کافی نیست. مسیرهای مالی، auth، migration، sync و recovery ریسک بالاتری دارند و به integration/end-to-end evidence بیشتری نیاز دارند؛ logic خالص را می‌توان سریع‌تر با unit test پوشش داد."},
+    {"type":"SUBTITLE","text":"CI/CD pipeline"},
+    {"type":"CODE","language":"text","code":"validate -> lint -> unit-test -> integration-test -> build -> scan -> checksum/sign -> artifact -> staged-release -> verify"},
+    {"type":"LIST","items":["build باید reproducible و versioned باشد.","artifact نهایی checksum و provenance قابل ردیابی داشته باشد.","release environment secret را در runtime امن inject کند.","staged rollout با معیار توقف تعریف شود.","rollback یا forward-fix runbook قبل از incident آماده باشد."]},
+    {"type":"SUBTITLE","text":"Observability"},
+    {"type":"LIST","items":["Log: event ساخت‌یافته با correlation/request ID و بدون داده حساس.","Metric: نرخ، خطا، latency، saturation و business KPI مرتبط.","Trace: مسیر درخواست بین component/serviceها و bottleneckها.","Alert: بر اساس symptom و SLO، نه صرفاً هر log error.","Dashboard باید امکان پاسخ به وضعیت سیستم و اثر روی کاربر را بدهد."]},
+    {"type":"SUBTITLE","text":"Incident readiness"},
+    {"type":"PARAGRAPH","text":"تیم باید بداند هنگام regression، migration failure، dependency outage یا credential leak چه کند. owner، severity، communication، containment، recovery و postmortem باید تعریف شوند."},
+    {"type":"IMPORTANT","text":"Compile شدن، test pass شدن و حتی deploy موفق به تنهایی Production Ready نیست. سیستم باید قابل مشاهده، قابل بازیابی، قابل rollback و دارای security evidence باشد."},
+    {"type":"EXERCISE","text":"برای Capstone یک Production Readiness Review بسازید: architecture diagram، threat model، test matrix، CI/CD pipeline، dependency/secret scanning، SLO/metrics/log/trace plan، migration recovery، staged rollout و incident runbook. هر مورد باید evidence قابل بررسی داشته باشد."},
+    {"type":"PROJECT_LINK","text":"این درس مستقیماً معیارهای پروژه kt-prj-008 Production Capstone را پوشش می‌دهد."}
+  ]
+}
