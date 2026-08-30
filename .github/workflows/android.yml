@@ -27,11 +27,11 @@ jobs:
       - name: Validate course
         run: python3 tools/validate_course.py
 
-      - name: Sync course assets
+      - name: Sync complete course package into Android assets
         run: |
+          rm -rf app/src/main/assets/course/kotlin
           mkdir -p app/src/main/assets/course/kotlin
-          cp course/manifest.json course/levels.json course/chapters.json app/src/main/assets/course/kotlin/
-          cp -R course/lessons course/exercises course/quizzes course/projects course/glossary app/src/main/assets/course/kotlin/
+          cp -R course/. app/src/main/assets/course/kotlin/
 
       - name: Run Android lint
         run: gradle :app:lintDebug
