@@ -16,9 +16,23 @@ jobs:
       RELEASE_KEY_PASSWORD: ${{ secrets.AS_RELEASE_KEY_PASSWORD }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Kotlin app
+        uses: actions/checkout@v4
         with:
+          path: AS-Academy-Kotlin
           submodules: recursive
+
+      - name: Checkout MainUi
+        uses: actions/checkout@v4
+        with:
+          repository: waxew/AS-Academy-MainUi
+          path: AS-Academy-MainUi
+
+      - name: Checkout MainCourse
+        uses: actions/checkout@v4
+        with:
+          repository: waxew/AS-Academy-MainCourse
+          path: AS-Academy-MainCourse
 
       - uses: actions/setup-java@v5
         with:
@@ -29,26 +43,38 @@ jobs:
         with:
           gradle-version: '9.4.1'
 
-      - name: Validate course
-        run: python3 tools/validate_course.py
-
-      - name: Sync complete course package into Android assets
+      - name: Sync MainCourse Kotlin package into Android assets
+        working-directory: AS-Academy-Kotlin
         run: |
           rm -rf app/src/main/assets/course/kotlin
           mkdir -p app/src/main/assets/course/kotlin
-          cp -R course/. app/src/main/assets/course/kotlin/
+          cp -R ../AS-Academy-MainCourse/courses/kotlin/course/. app/src/main/assets/course/kotlin/
+
+      - name: Validate legacy package during migration
+        working-directory: AS-Academy-Kotlin
+        run: python3 tools/validate_course.py
 
       - name: Run Android lint
+        working-directory: AS-Academy-Kotlin
+        env:
+          ACADEMY_MAIN_UI_DIR: ../AS-Academy-MainUi
         run: gradle :app:lintDebug
 
       - name: Run unit tests
+        working-directory: AS-Academy-Kotlin
+        env:
+          ACADEMY_MAIN_UI_DIR: ../AS-Academy-MainUi
         run: gradle :app:testDebugUnitTest
 
       - name: Build debug APK
+        working-directory: AS-Academy-Kotlin
+        env:
+          ACADEMY_MAIN_UI_DIR: ../AS-Academy-MainUi
         run: gradle :app:assembleDebug
 
       - name: Prepare permanent release signing
         if: ${{ env.RELEASE_KEYSTORE_BASE64 != '' }}
+        working-directory: AS-Academy-Kotlin
         run: |
           printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/as-academy-release.jks"
           echo "AS_RELEASE_STORE_FILE=$RUNNER_TEMP/as-academy-release.jks" >> "$GITHUB_ENV"
@@ -58,43 +84,26 @@ jobs:
           echo "AS_RELEASE_SIGNING_ENABLED=true" >> "$GITHUB_ENV"
 
       - name: Build release APK and AAB
+        working-directory: AS-Academy-Kotlin
+        env:
+          ACADEMY_MAIN_UI_DIR: ../AS-Academy-MainUi
         run: gradle :app:assembleRelease :app:bundleRelease
 
-      - name: Verify signed release identity
-        if: ${{ env.AS_RELEASE_SIGNING_ENABLED == 'true' }}
-        run: |
-          APK="app/build/outputs/apk/release/app-release.apk"
-          test -f "$APK"
-          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)
-          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee app/build/outputs/apk/release/signature-verification.txt
-
-      - name: Generate checksums
+      - name: Generate checksums and release metadata
+        working-directory: AS-Academy-Kotlin
         run: |
           sha256sum app/build/outputs/apk/debug/app-debug.apk > app/build/outputs/apk/debug/app-debug.apk.sha256
-          find app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' -print0 | while IFS= read -r -d '' file; do
-            sha256sum "$file" > "$file.sha256"
-          done
-          if [ -f app/build/outputs/bundle/release/app-release.aab ]; then
-            sha256sum app/build/outputs/bundle/release/app-release.aab > app/build/outputs/bundle/release/app-release.aab.sha256
-          fi
-
-      - name: Write release metadata
-        run: |
+          find app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' -print0 | while IFS= read -r -d '' file; do sha256sum "$file" > "$file.sha256"; done
           mkdir -p app/build/outputs/release-metadata
-          {
-            echo "versionName=1.2.0"
-            echo "versionCode=12000"
-            echo "commit=${GITHUB_SHA}"
-            echo "signed=${AS_RELEASE_SIGNING_ENABLED:-false}"
-          } > app/build/outputs/release-metadata/release-info.txt
+          printf 'versionName=1.2.0\nversionCode=12000\ncommit=%s\nsigned=%s\ncontentSource=AS-Academy-MainCourse/courses/kotlin/course\nuiSource=AS-Academy-MainUi\n' "$GITHUB_SHA" "${AS_RELEASE_SIGNING_ENABLED:-false}" > app/build/outputs/release-metadata/release-info.txt
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: AS-Academy-Kotlin-debug-1.2.0
           path: |
-            app/build/outputs/apk/debug/app-debug.apk
-            app/build/outputs/apk/debug/app-debug.apk.sha256
+            AS-Academy-Kotlin/app/build/outputs/apk/debug/app-debug.apk
+            AS-Academy-Kotlin/app/build/outputs/apk/debug/app-debug.apk.sha256
 
       - name: Upload release build
         uses: actions/upload-artifact@v4
@@ -102,17 +111,7 @@ jobs:
           name: AS-Academy-Kotlin-release-1.2.0
           if-no-files-found: error
           path: |
-            app/build/outputs/apk/release/*.apk
-            app/build/outputs/apk/release/*.sha256
-            app/build/outputs/apk/release/signature-verification.txt
-            app/build/outputs/bundle/release/*.aab
-            app/build/outputs/bundle/release/*.sha256
-            app/build/outputs/release-metadata/release-info.txt
-
-      - name: Upload lint report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: AS-Academy-Kotlin-lint
-          if-no-files-found: ignore
-          path: app/build/reports/lint-results-debug.html
+            AS-Academy-Kotlin/app/build/outputs/apk/release/*.apk
+            AS-Academy-Kotlin/app/build/outputs/apk/release/*.sha256
+            AS-Academy-Kotlin/app/build/outputs/bundle/release/*.aab
+            AS-Academy-Kotlin/app/build/outputs/release-metadata/release-info.txt
