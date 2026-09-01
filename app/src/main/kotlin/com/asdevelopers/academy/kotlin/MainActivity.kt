@@ -3,20 +3,19 @@ package com.asdevelopers.academy.kotlin
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.asdevelopers.academy.core.ui.AcademyCourseApp
+import com.asdevelopers.academy.mainui.AcademyMainUi
 
 /**
- * نقطه ورود بسیار نازک اپ Kotlin در معماری جدید AS Academy.
+ * نقطه ورود نازک اپ Kotlin در معماری جدید AS Academy.
  *
- * Core مالک engine و persistence است، MainCourse مالک محتوای آموزشی است و
- * MainUi مالک پوسته مشترک خواهد بود. تا زمان انتشار module قابل build از MainUi،
- * AcademyCourseApp موجود در Core به‌عنوان compatibility shell استفاده می‌شود.
+ * Core مالک engine و persistence، MainCourse مالک Course Package و MainUi مالک
+ * presentation/navigation مشترک است. این Activity فقط هویت دوره را تزریق می‌کند.
  */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AcademyCourseApp(courseId = KotlinAcademyConfig.COURSE_ID)
+            AcademyMainUi(courseId = KotlinAcademyConfig.COURSE_ID)
         }
     }
 }
