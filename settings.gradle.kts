@@ -17,12 +17,18 @@ dependencyResolutionManagement {
 rootProject.name = "AS-Academy-Kotlin"
 include(":app")
 
-// AS Academy Core is consumed as a composite build so all shared learning,
-// progress, quiz, exercise and content-engine logic stays centralized.
+// Shared runtime/learning engine.
 includeBuild("as-academy-core") {
     dependencySubstitution {
-        // Map the stable Course Package coordinate used by course apps to
-        // the actual :core module inside the AS-Academy-Core repository.
         substitute(module("com.asdevelopers.academy:core")).using(project(":core"))
+    }
+}
+
+// Shared presentation layer. CI/local checkout can provide the sibling repository
+// through ACADEMY_MAIN_UI_DIR while the fallback keeps the expected workspace layout explicit.
+val academyMainUiDir = System.getenv("ACADEMY_MAIN_UI_DIR") ?: "../AS-Academy-MainUi"
+includeBuild(academyMainUiDir) {
+    dependencySubstitution {
+        substitute(module("com.asdevelopers.academy:main-ui")).using(project(":main-ui"))
     }
 }
