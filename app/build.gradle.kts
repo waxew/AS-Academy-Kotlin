@@ -17,7 +17,6 @@ android {
     }
 
     // Release signing is intentionally external to source control.
-    // Keeping the same keystore for every future version is what makes APK updates installable.
     val releaseStoreFile = providers.environmentVariable("AS_RELEASE_STORE_FILE").orNull
     val releaseStorePassword = providers.environmentVariable("AS_RELEASE_STORE_PASSWORD").orNull
     val releaseKeyAlias = providers.environmentVariable("AS_RELEASE_KEY_ALIAS").orNull
@@ -41,21 +40,14 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
-            // Debug remains separate from the publish signing identity.
-            isDebuggable = true
-        }
+        getByName("debug") { isDebuggable = true }
         getByName("release") {
             isMinifyEnabled = false
-            if (hasReleaseSigning) {
-                signingConfig = signingConfigs.getByName("release")
-            }
+            if (hasReleaseSigning) signingConfig = signingConfigs.getByName("release")
         }
     }
 
-    buildFeatures {
-        compose = true
-    }
+    buildFeatures { compose = true }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -66,7 +58,8 @@ android {
 }
 
 dependencies {
-    implementation("com.asdevelopers.academy:core")
+    // MainUi exposes the shared Academy presentation surface and transitively exposes Core APIs.
+    implementation("com.asdevelopers.academy:main-ui")
     implementation("androidx.core:core-ktx:1.19.0")
     implementation("androidx.activity:activity-compose:1.13.0")
     implementation(platform("androidx.compose:compose-bom:2026.08.00"))
